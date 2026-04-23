@@ -1,0 +1,2864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Marketplace - Digital Farmers Market</title>
+    
+    
+ <!-- FORCE REDIRECT - THIS RUNS BEFORE ANYTHING ELSE -->
+    <script>
+        // Immediately check and redirect - using async but with immediate action
+        (function() {
+            // First, hide the body immediately to prevent flash of content
+            document.documentElement.style.display = 'none';
+            
+            fetch('http://localhost:5000/api/maintenance-status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.maintenance_mode === true) {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        window.location.replace('/maintenance.html');
+                    } else {
+                        // Show the page if maintenance is off
+                        document.documentElement.style.display = '';
+                    }
+                })
+                .catch(err => {
+                    console.log('Maintenance check failed:', err);
+                    document.documentElement.style.display = '';
+                });
+        })();
+    </script>
+    
+    <link rel="icon" type="image/png" href="/customer/Logo.png">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/customer/customer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========== EXISTING STYLES ========== */
+        
+        .mobile-search-row {
+            display: none;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .mobile-search-row .search-box {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            position: relative;
+        }
+        
+        .mobile-search-row .search-box input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            border-radius: 40px;
+        }
+        
+        .mobile-search-row .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            z-index: 1;
+        }
+        
+        @media (max-width: 900px) {
+            .navbar-customer .container > .search-box.large {
+                display: none;
+            }
+            .mobile-search-row {
+                display: block;
+            }
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: auto !important;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            min-width: 160px;
+            width: auto;
+            z-index: 1000;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .notification-dropdown {
+            position: relative;
+        }
+        
+        .notification-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: auto !important;
+            width: 380px;
+            max-width: 90vw;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .notification-menu.show {
+            display: block;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .notification-header h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .notification-header .mark-all-read {
+            background: none;
+            border: none;
+            color: #16a34a;
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .notification-header .mark-all-read:hover {
+            background: #e5e7eb;
+        }
+        
+        .delete-all-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .delete-all-btn:hover {
+            background: #fee2e2;
+        }
+        
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .notification-item.unread {
+            background: #f0fdf4;
+        }
+        
+        .notification-item:hover {
+            background: #f9fafb;
+        }
+        
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #16a34a;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-content p {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.85rem;
+            color: #374151;
+            line-height: 1.4;
+        }
+        
+        .notification-time {
+            font-size: 0.7rem;
+            color: #9ca3af;
+        }
+        
+        .notification-delete {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .notification-item:hover .notification-delete {
+            opacity: 1;
+        }
+        
+        .notification-delete:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .notification-empty, .loading {
+            padding: 2rem;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .search-box input {
+            padding-left: 2.5rem !important;
+        }
+        
+        .avatar span {
+            display: inline-block;
+        }
+        
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            min-width: 200px;
+            max-width: 320px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 0;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .toast-notification.success {
+            border-left: 4px solid #16a34a;
+        }
+        
+        .toast-notification.error {
+            border-left: 4px solid #dc2626;
+        }
+        
+        .toast-notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .toast-notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+        }
+        
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-icon i {
+            font-size: 16px;
+        }
+        
+        .toast-notification.success .toast-icon i {
+            color: #16a34a;
+        }
+        
+        .toast-notification.error .toast-icon i {
+            color: #dc2626;
+        }
+        
+        .toast-notification.info .toast-icon i {
+            color: #3b82f6;
+        }
+        
+        .toast-notification.warning .toast-icon i {
+            color: #f59e0b;
+        }
+        
+        .toast-message {
+            flex: 1;
+            font-size: 0.85rem;
+            color: #374151;
+            line-height: 1.4;
+        }
+        
+        .toast-close {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .toast-close:hover {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* ========== MINIMAL FARMER PROFILE MODAL ========== */
+        .farmer-profile-modal-content {
+            max-width: 420px;
+            width: 90%;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            animation: modalFadeIn 0.25s ease;
+            position: relative;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .farmer-profile-container {
+            padding: 24px;
+        }
+        
+        /* Header */
+        .farmer-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .farmer-avatar {
+            width: 56px;
+            height: 56px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .farmer-avatar i {
+            font-size: 28px;
+            color: #16a34a;
+        }
+        
+        .farmer-info {
+            flex: 1;
+        }
+        
+        .farmer-name {
+            font-size: 0.70rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 4px 0;
+        }
+        
+        .farmer-farm {
+            font-size: 0.75rem;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        
+        .farmer-location {
+            font-size: 0.7rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .farmer-location i {
+            font-size: 0.65rem;
+            color: #ef4444;
+        }
+        
+        /* Product Count Badge */
+        .product-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0fdf4;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .product-count-badge i {
+            font-size: 0.7rem;
+            color: #16a34a;
+        }
+        
+        .product-count-badge span {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #16a34a;
+        }
+        
+        /* Contact */
+        .farmer-contact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            margin-bottom: 12px;
+        }
+        
+        .farmer-contact i {
+            width: 16px;
+            color: #16a34a;
+            font-size: 0.8rem;
+        }
+        
+        .farmer-contact span {
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+        
+        /* Description */
+        .farmer-description {
+            background: #f9fafb;
+            padding: 12px 14px;
+            border-radius: 14px;
+            margin: 12px 0 16px 0;
+        }
+        
+        .farmer-description p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        
+        /* Products Preview */
+        .products-preview {
+            margin: 16px 0;
+        }
+        
+        .products-preview-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .products-preview-title i {
+            color: #16a34a;
+            font-size: 0.75rem;
+        }
+        
+        .preview-products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .preview-product-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            background: #f9fafb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preview-product-item:hover {
+            background: #f0fdf4;
+            transform: translateX(4px);
+        }
+        
+        .preview-product-img {
+            width: 40px;
+            height: 40px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .preview-product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-product-img i {
+            font-size: 1rem;
+            color: #9ca3af;
+        }
+        
+        .preview-product-details {
+            flex: 1;
+        }
+        
+        .preview-product-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .preview-product-price {
+            font-size: 0.5rem;
+            color: #16a34a;
+            font-weight: 500;
+        }
+        
+        .view-more-link {
+            font-size: 0.75rem;
+            color: #16a34a;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            padding: 8px 0;
+        }
+        
+        .view-more-link:hover {
+            color: #15803d;
+        }
+        
+        /* Buttons */
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-action {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            border: none;
+        }
+        
+        .btn-action-outline {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .btn-action-outline:hover {
+            background: #f9fafb;
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+        
+        .btn-action-primary {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-action-primary:hover {
+            background: #15803d;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .modal-lg {
+            max-width: 800px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: rgba(0,0,0,0.08);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.2s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: rgba(0,0,0,0.15);
+            color: #374151;
+        }
+        
+        /* Force remove all extra spaces */
+        .navbar-customer {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: white;
+            width: 100%;
+        }
+        
+        .navbar-customer .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            gap: 0;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100%;
+        }
+        
+        .logo {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-shrink: 0;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 0.7rem;
+            margin: 0 !important;
+        }
+        
+        .btn-seller {
+            padding: 0.5rem 0.8rem;
+            margin: 0 !important;
+        }
+        
+        .user-toggle {
+            padding: 0.5rem;
+            margin: 0 !important;
+        }
+        
+        .notification-toggle {
+            padding: 0.5rem;
+            margin: 0 !important;
+        }
+        
+        .dropdown-menu, .notification-menu {
+            left: auto !important;
+            right: 0 !important;
+            margin-top: 0.5rem;
+            margin-right: 0 !important;
+        }
+        
+        .user-dropdown, .notification-dropdown {
+            position: relative;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        @media (max-width: 1100px) {
+            .btn-seller span {
+                display: none;
+            }
+            .nav-actions {
+                gap: 0.2rem;
+            }
+            .nav-link {
+                padding: 0.5rem 0.5rem;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .navbar-customer .container {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* Product Card Styles */
+        body {
+            color: #111827;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        .logo i.fa-seedling {
+            color: #16a34a !important;
+            font-size: 1.5rem;
+        }
+        .logo span {
+            color: #111827 !important;
+            font-weight: 600;
+        }
+        
+        .search-box input {
+            color: #111827;
+        }
+        .search-box input::placeholder {
+            color: #4b5563;
+        }
+        
+        .nav-link span, .nav-link i {
+            color: #111827 !important;
+        }
+        .nav-link.active span, .nav-link.active i {
+            color: #16a34a !important;
+        }
+        .badge {
+            background: #16a34a;
+            color: white !important;
+        }
+        .btn-seller {
+            background: #16a34a;
+            color: white !important;
+        }
+        .btn-seller i, .btn-seller span {
+            color: white !important;
+        }
+        .user-toggle span#customer-name {
+            color: #111827 !important;
+            font-weight: 600;
+        }
+        .user-toggle i {
+            color: #111827 !important;
+        }
+        .avatar {
+            background: #dcfce7;
+            color: #16a34a !important;
+        }
+        .dropdown-menu a {
+            color: #111827 !important;
+        }
+        .dropdown-menu a.logout-btn {
+            color: #dc2626 !important;
+        }
+        
+        .products-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+        }
+        
+        .product-card-marketplace {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: row;
+            height: auto;
+            min-height: 240px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .product-card-marketplace:hover {
+            border-color: #16a34a;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1);
+        }
+        
+        .product-image {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #f9fafb;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #9ca3af;
+            font-size: 3rem;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            z-index: 2;
+        }
+        
+        .product-info {
+            padding: 1.25rem 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-category {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #16a34a;
+        }
+        
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.4;
+        }
+        
+        .product-description {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .product-rating-minimal {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rating-stars-minimal {
+            color: #fbbf24;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 2px;
+        }
+        
+        .rating-text-minimal {
+            font-size: 0.85rem;
+            color: #4b5563;
+        }
+        
+        .rating-text-minimal.no-reviews {
+            color: #9ca3af;
+        }
+        
+        .farmer-info-minimal {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            margin: 0.5rem 0;
+            border-top: 1px solid #f3f4f6;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+        }
+        
+        .farmer-info-minimal:hover {
+            background: #f9fafb;
+            padding: 0.75rem;
+            margin: 0.5rem -0.75rem;
+            border-radius: 8px;
+        }
+        
+        .farmer-avatar-minimal {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #16a34a;
+            font-size: 0.9rem;
+        }
+        
+        .farmer-details-minimal {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 1rem;
+        }
+        
+        .farmer-name-minimal {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #111827;
+        }
+        
+        .farmer-location-minimal {
+            font-size: 0.85rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .product-footer-minimal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+        
+        .price-section-minimal {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+        
+        .price-minimal {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111827;
+            line-height: 1.2;
+        }
+        
+        .price-unit-minimal {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #000000;
+            margin-left: 0.15rem;
+        }
+        
+        .stock-minimal {
+            font-size: 0.60rem;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .stock-minimal i {
+            font-size: 0.9rem;
+            color: #16a34a;
+        }
+        
+        .stock-minimal.low-stock {
+            color: #b45309;
+        }
+        
+        .stock-minimal.low-stock i {
+            color: #b45309;
+        }
+        
+        .stock-minimal.out-of-stock {
+            color: #b91c1c;
+        }
+        
+        .stock-minimal.out-of-stock i {
+            color: #b91c1c;
+        }
+        
+        .action-buttons-minimal {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .action-btn {
+            padding: 0.2rem 0.80rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.1rem;
+        }
+        
+        .action-btn i {
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            background: #f9fafb;
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+        
+        .action-btn.cart-btn {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: white;
+        }
+        
+        .action-btn.cart-btn:hover {
+            background: #15803d;
+            border-color: #15803d;
+        }
+        
+        .action-btn.buy-now-btn {
+            background: #3b82f6;
+            border-color: #a5f63b;
+            color: white;
+        }
+        
+        .action-btn.buy-now-btn:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .sort-options {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+            padding: 0 2rem;
+        }
+        
+        .sort-label {
+            font-size: 0.85rem;
+            color: #4b5563;
+        }
+        
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #111827;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .quick-view-content {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem;
+        }
+        
+        .quick-view-image {
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .quick-view-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+        
+        .quick-view-info {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .quick-view-info h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+        
+        .quick-view-info .product-category {
+            display: inline-block;
+            background: #e5e7eb;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            width: fit-content;
+        }
+        
+        .quick-view-price {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #16a34a;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+        
+        .quick-view-price .price-unit {
+            font-size: 0.80rem;
+            font-weight: 200;
+            color: #6b7280;
+        }
+        
+        .quick-view-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .quick-view-actions .btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .quick-view-actions .btn-primary {
+            background: #16a34a;
+            color: white;
+            border: none;
+        }
+        
+        .quick-view-actions .btn-primary:hover {
+            background: #15803d;
+        }
+        
+        .quick-view-actions .btn-outline {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+        
+        .quick-view-actions .btn-outline:hover {
+            background: #f9fafb;
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+        
+        .checkout-modal-content {
+            padding: 0.5rem;
+        }
+        
+        .checkout-product-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .checkout-product-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #e5e7eb;
+        }
+        
+        .checkout-product-details {
+            flex: 1;
+        }
+        
+        .checkout-product-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+        
+        .checkout-product-price {
+            font-size: 0.85rem;
+            color: #16a34a;
+            font-weight: 500;
+        }
+        
+        .checkout-quantity {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .qty-btn:hover {
+            background: #f3f4f6;
+            border-color: #16a34a;
+        }
+        
+        .qty-value {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .checkout-item-total {
+            font-weight: 700;
+            color: #16a34a;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .checkout-summary {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+        
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #111827;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 0.25rem;
+            padding-top: 0.75rem;
+        }
+        
+        .checkout-form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .checkout-form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        
+        .checkout-form-group input,
+        .checkout-form-group select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .checkout-form-group input:focus,
+        .checkout-form-group select:focus {
+            outline: none;
+            border-color: #16a34a;
+            box-shadow: 0 0 0 2px rgba(22,163,74,0.1);
+        }
+        
+        .checkout-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .checkout-actions .btn {
+            flex: 1;
+            padding: 0.7rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .filters-panel {
+            display: none;
+        }
+        .filters-panel.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .product-card-marketplace {
+                flex-direction: column;
+                height: auto;
+            }
+            .product-image {
+                width: 100%;
+                height: 200px;
+            }
+            .products-container {
+                padding: 1rem;
+            }
+            .sort-options {
+                padding: 0 1rem;
+            }
+            .quick-view-content {
+                flex-direction: column;
+            }
+            .quick-view-image {
+                max-width: 100%;
+            }
+            .quick-view-actions {
+                flex-direction: column;
+            }
+            
+            .action-buttons-minimal {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .action-btn {
+                padding: 0.3rem 0.2rem;
+                font-size: 0.6rem;
+                justify-content: center;
+            }
+            
+            .action-btn i {
+                font-size: 0.75rem;
+            }
+            
+            .checkout-product-row {
+                flex-wrap: wrap;
+            }
+            .checkout-item-total {
+                text-align: left;
+                margin-left: 70px;
+            }
+            
+            .farmer-profile-modal-content {
+                width: 95%;
+                margin: 16px;
+            }
+            .farmer-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .preview-product-item {
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-customer">
+        <div class="container">
+            <a href="/customer/marketplace.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="Logo.png" alt="Logo" style="height: 60px; width: auto; border-radius: 8px;">
+                <div>
+                    <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
+                </div>
+            </a>
+            
+            <div class="search-box large">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search products...">
+            </div>
+            
+            <div class="nav-actions">
+                <a href="/customer/marketplace.html" class="nav-link active">
+                    <i class="fas fa-store"></i>
+                    <span>Marketplace</span>
+                </a>
+                <a href="/customer/cart.html" class="nav-link" id="cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Cart</span>
+                    <span class="badge" id="cart-count">0</span>
+                </a>
+                <a href="/customer/orders.html" class="nav-link">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Orders</span>
+                    <span class="badge" id="orders-badge" style="display: none;">0</span>
+                </a>
+                <a href="/customer/profile.html" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+
+                <div class="notification-dropdown">
+                    <button class="notification-toggle" id="notificationToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notificationBadge" style="display: none;">0</span>
+                    </button>
+                    <div class="notification-menu" id="notificationMenu">
+                        <div class="notification-header">
+                            <h4>Notifications</h4>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="mark-all-read" id="markAllRead">Mark all as read</button>
+                                <button class="delete-all-btn" id="deleteAllNotifications" title="Delete all notifications">
+                                    <i class="fas fa-trash"></i> Delete all
+                                </button>
+                            </div>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-seller" id="becomeSellerBtn">
+                    <i class="fas fa-store-alt"></i>
+                    <span>Become a Seller</span>
+                </button>
+                
+                <a href="/farmer/dashboard.html" class="btn-seller" id="farmerDashboardBtn" style="display: none;">
+                    <i class="fas fa-tractor"></i>
+                    <span>Seller Dashboard</span>
+                </a>
+                
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userToggle">
+                        <div class="avatar">
+                            <span id="customer-initial"></span>
+                        </div>
+                        <span id="customer-name"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="/customer/profile.html">My Profile</a>
+                        <a href="/farmer/dashboard.html" id="dashboard-link" style="display: none;">Seller Dashboard</a>
+                        <a href="#" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mobile-search-row">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="mobile-search-input" placeholder="Search products...">
+            </div>
+        </div>
+    </nav>
+
+    <main class="marketplace-layout">
+        <div class="filter-button-container">
+            <button class="filter-toggle-btn" id="filterToggleBtn">
+                <i class="fas fa-sliders-h"></i>
+                Show Filters
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="filters-panel" id="filtersPanel">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Rice">Rice</option>
+                        <option value="Crops">Crops</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Vegetables">Vegetables</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Barangay</label>
+                    <select id="barangay-filter">
+                        <option value="">Select Barangay</option>
+                        <option value="A. Bonifacio (Tinurilan)">A. Bonifacio (Tinurilan)</option>
+                        <option value="Abad Santos (Kambal)">Abad Santos (Kambal)</option>
+                        <option value="Aguinaldo (Lipata Dako)">Aguinaldo (Lipata Dako)</option>
+                        <option value="Antipolo">Antipolo</option>
+                        <option value="Aquino (Imelda)">Aquino (Imelda)</option>
+                        <option value="Beguin">Beguin</option>
+                        <option value="Bical">Bical</option>
+                        <option value="Bonga">Bonga</option>
+                        <option value="Butag">Butag</option>
+                        <option value="Cadandanan">Cadandanan</option>
+                        <option value="Calomagon">Calomagon</option>
+                        <option value="Calpi">Calpi</option>
+                        <option value="Cocok-Cabitan">Cocok-Cabitan</option>
+                        <option value="Daganas">Daganas</option>
+                        <option value="Danao">Danao</option>
+                        <option value="Dolos">Dolos</option>
+                        <option value="E. Quirino (Pinangomhan)">E. Quirino (Pinangomhan)</option>
+                        <option value="Fabrica">Fabrica</option>
+                        <option value="G. Del Pilar (Tanga)">G. Del Pilar (Tanga)</option>
+                        <option value="Gate">Gate</option>
+                        <option value="Inararan">Inararan</option>
+                        <option value="J. Gerona (Biton)">J. Gerona (Biton)</option>
+                        <option value="J.P. Laurel (Pon-od)">J.P. Laurel (Pon-od)</option>
+                        <option value="Jamorawon">Jamorawon</option>
+                        <option value="Lajong">Lajong</option>
+                        <option value="Libertad (Calle Putol)">Libertad (Calle Putol)</option>
+                        <option value="Magsaysay (Bongog)">Magsaysay (Bongog)</option>
+                        <option value="Managa-naga">Managa-naga</option>
+                        <option value="Marinab">Marinab</option>
+                        <option value="Montecalvario">Montecalvario</option>
+                        <option value="N. Roque (Calayugan)">N. Roque (Calayugan)</option>
+                        <option value="Namo">Namo</option>
+                        <option value="Nasuje">Nasuje</option>
+                        <option value="Obrero">Obrero</option>
+                        <option value="Osmeña (Lipata Saday)">Osmeña (Lipata Saday)</option>
+                        <option value="Otavi">Otavi</option>
+                        <option value="Padre Diaz">Padre Diaz</option>
+                        <option value="Palale">Palale</option>
+                        <option value="Quezon (Cabarawan)">Quezon (Cabarawan)</option>
+                        <option value="R. Gerona (Butag)">R. Gerona (Butag)</option>
+                        <option value="Recto">Recto</option>
+                        <option value="Roxas (Busay)">Roxas (Busay)</option>
+                        <option value="Sagrada">Sagrada</option>
+                        <option value="San Francisco (Polot)">San Francisco (Polot)</option>
+                        <option value="San Isidro (Cabugaan)">San Isidro (Cabugaan)</option>
+                        <option value="San Juan Bag-o">San Juan Bag-o</option>
+                        <option value="San Juan Daan">San Juan Daan</option>
+                        <option value="San Rafael (Togbongon)">San Rafael (Togbongon)</option>
+                        <option value="San Ramon">San Ramon</option>
+                        <option value="San Vicente">San Vicente</option>
+                        <option value="Santa Remedios">Santa Remedios</option>
+                        <option value="Santa Teresita (Trece)">Santa Teresita (Trece)</option>
+                        <option value="Sigad">Sigad</option>
+                        <option value="Somagongsong">Somagongsong</option>
+                        <option value="Tarhan">Tarhan</option>
+                        <option value="Taromata">Taromata</option>
+                        <option value="Zone 1 (Ilawod)">Zone 1 (Ilawod)</option>
+                        <option value="Zone 2 (Sabang)">Zone 2 (Sabang)</option>
+                        <option value="Zone 3 (Central)">Zone 3 (Central)</option>
+                        <option value="Zone 4 (Central Business District)">Zone 4 (Central Business District)</option>
+                        <option value="Zone 5 (Canipaan)">Zone 5 (Canipaan)</option>
+                        <option value="Zone 6 (Baybay)">Zone 6 (Baybay)</option>
+                        <option value="Zone 7 (Iraya)">Zone 7 (Iraya)</option>
+                        <option value="Zone 8 (Loyo)">Zone 8 (Loyo)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Price Range</label>
+                    <div class="price-range">
+                        <input type="number" id="min-price" placeholder="Min" min="0">
+                        <span>to</span>
+                        <input type="number" id="max-price" placeholder="Max" min="0">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sort-filter">
+                        <option value="newest">Newest First</option>
+                        <option value="top_rated">Top Rated</option>
+                        <option value="popular">Most Searched</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn btn-outline" id="clear-filters">
+                    <i class="fas fa-times"></i> Clear All
+                </button>
+                <button class="btn btn-primary" id="apply-filters">
+                    <i class="fas fa-check"></i> Apply Filters
+                </button>
+            </div>
+        </div>
+
+        <div class="sort-options">
+            <span class="sort-label"><i class="fas fa-chart-line"></i> Sort by:</span>
+            <select id="quick-sort" class="sort-select">
+                <option value="top_rated">⭐ Top Rated First</option>
+                <option value="popular">🔥 Most Searched</option>
+                <option value="newest">🆕 Newest First</option>
+                <option value="price_low">💰 Price: Low to High</option>
+                <option value="price_high">💰 Price: High to Low</option>
+            </select>
+        </div>
+
+        <div class="category-nav">
+            <div class="category-buttons">
+                <button class="category-btn all-btn active" data-category="all">
+                    <i class="fas fa-th-large"></i>
+                    All Products
+                </button>
+                <button class="category-btn" data-category="Rice">
+                    <i class="fas fa-seedling"></i>
+                    Rice
+                </button>
+                <button class="category-btn" data-category="Crops">
+                    <i class="fas fa-leaf"></i>
+                    Crops
+                </button>
+                <button class="category-btn" data-category="Fruits">
+                    <i class="fas fa-apple-alt"></i>
+                    Fruits
+                </button>
+                <button class="category-btn" data-category="Vegetables">
+                    <i class="fas fa-carrot"></i>
+                    Vegetables
+                </button>
+            </div>
+        </div>
+
+        <div class="marketplace-hero">
+            <h1>Fresh from Local Farms</h1>
+            <p>Discover fresh, high-quality agricultural products directly from farmers in Bulan, Sorsogon</p>
+        </div>
+
+        <section class="recommendations-section" id="recommendations-section" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-star" style="color: #fbbf24;"></i> Recommended For You</h2>
+                <p class="text-light">Based on your browsing history</p>
+            </div>
+            <div class="recommendations-container" id="recommendations-container">
+                <div class="loading">Loading recommendations...</div>
+            </div>
+        </section>
+        
+        <section class="all-products" id="all-products">
+            <div class="section-header">
+                <h2>All Products</h2>
+                <button class="clear-farmer-btn" id="clear-farmer-filter" style="display: none;">
+                    <i class="fas fa-times"></i> Clear Farmer Filter
+                </button>
+            </div>
+            <div class="products-container" id="products-container">
+                <div class="loading">Loading products...</div>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </section>
+    </main>
+
+    <!-- Product Quick View Modal -->
+    <div class="modal-overlay" id="quick-view-modal" style="display: none;">
+        <div class="modal modal-lg">
+            <button class="modal-close" id="quick-view-close">&times;</button>
+            <div class="modal-content" id="quick-view-content"></div>
+        </div>
+    </div>
+
+    <!-- Clean Checkout Modal -->
+    <div class="modal-overlay" id="checkout-modal" style="display: none;">
+        <div class="modal" style="max-width: 550px;">
+            <button class="modal-close" id="checkout-modal-close">&times;</button>
+            <div class="modal-content">
+                <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem;">
+                    <i class="fas fa-shopping-cart" style="color: #16a34a;"></i> 
+                    Checkout
+                </h2>
+                <div id="checkout-content" class="checkout-modal-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farmer Profile Modal - MINIMAL -->
+    <div class="modal-overlay" id="farmer-profile-modal" style="display: none;">
+        <div class="farmer-profile-modal-content">
+            <button class="modal-close" id="farmer-profile-close">&times;</button>
+            <div id="farmer-profile-content"></div>
+        </div>
+    </div>
+
+    <!-- View Reviews Modal -->
+    <div class="modal-overlay" id="view-reviews-modal" style="display: none;">
+        <div class="modal modal-lg reviews-modal">
+            <button class="modal-close" onclick="closeViewReviewsModal()">&times;</button>
+            <div class="modal-content">
+                <h2><i class="fas fa-star" style="color: #fbbf24;"></i> Customer Reviews</h2>
+                <div id="view-reviews-product-info" style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;"></div>
+                <div id="reviews-summary" style="margin-bottom: 1.5rem;"></div>
+                <div id="reviews-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        let currentUserId = null;
+        let userRole = null;
+        let farmerProducts = new Set();
+        let currentFarmerId = null;
+        let currentFarmerName = '';
+        let currentFarmerData = null;
+        let buyNowProduct = null;
+
+        // Add this at the beginning of your dashboard JS
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            return originalFetch.apply(this, args).then(response => {
+                if (response.status === 503) {
+                    return response.clone().json().then(data => {
+                        if (data.maintenance === true) {
+                            localStorage.clear();
+                            sessionStorage.clear();
+                            window.location.href = '/maintenance.html';
+                        }
+                        throw new Error('Maintenance mode');
+                    }).catch(() => response);
+                }
+                return response;
+            });
+        };
+
+        function syncSearchInputs() {
+            const desktopInput = document.getElementById('search-input');
+            const mobileInput = document.getElementById('mobile-search-input');
+            if (desktopInput && mobileInput) {
+                mobileInput.addEventListener('input', function(e) {
+                    desktopInput.value = e.target.value;
+                    const event = new Event('input', { bubbles: true });
+                    desktopInput.dispatchEvent(event);
+                });
+                desktopInput.addEventListener('input', function(e) {
+                    mobileInput.value = e.target.value;
+                });
+            }
+        }
+
+        const SYNONYMS = {
+            'kamatis': 'tomato', 'tomato': 'kamatis',
+            'talong': 'eggplant', 'eggplant': 'talong',
+            'kalabasa': 'squash', 'squash': 'kalabasa',
+            'okra': 'okra',
+            'saging': 'banana', 'banana': 'saging',
+            'mangga': 'mango', 'mango': 'mangga',
+            'pinya': 'pineapple', 'pineapple': 'pinya',
+            'repolyo': 'cabbage', 'cabbage': 'repolyo',
+            'kangkong': 'water spinach', 'water spinach': 'kangkong',
+            'sitaw': 'string beans', 'string beans': 'sitaw',
+            'ampalaya': 'bitter gourd', 'bitter gourd': 'ampalaya',
+            'luya': 'ginger', 'ginger': 'luya',
+            'kamote': 'sweet potato', 'sweet potato': 'kamote',
+            'kamoteng kahoy': 'cassava', 'cassava': 'kamoteng kahoy',
+            'gabi': 'taro', 'taro': 'gabi',
+            'ube': 'purple yam', 'purple yam': 'ube',
+            'bigas': 'rice', 'rice': 'bigas',
+            'mais': 'corn', 'corn': 'mais',
+            'niyog': 'coconut', 'coconut': 'niyog',
+            'mani': 'peanut', 'peanut': 'mani'
+        };
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token) {
+                window.location.href = '/auth/login.html';
+                return;
+            }
+            
+            currentUserId = user.user_id;
+            userRole = user.role;
+            
+            const fullName = user.full_name || 'Customer';
+            document.getElementById('customer-name').textContent = fullName;
+            document.getElementById('customer-initial').textContent = fullName.charAt(0).toUpperCase();
+            
+            initDropdown();
+            syncSearchInputs();
+            
+            if (userRole === 'FARMER') {
+                await fetchFarmerProducts(token);
+                document.getElementById('becomeSellerBtn').style.display = 'none';
+                document.getElementById('farmerDashboardBtn').style.display = 'flex';
+                document.getElementById('dashboard-link').style.display = 'block';
+            } else {
+                document.getElementById('becomeSellerBtn').style.display = 'flex';
+                document.getElementById('farmerDashboardBtn').style.display = 'none';
+                document.getElementById('dashboard-link').style.display = 'none';
+                loadPersonalizedRecommendations();
+            }
+            
+            loadProducts();
+            updateCartCount();
+            updateOrdersBadge();
+            
+            setupEventListeners();
+            startNotificationPolling();
+        });
+
+        async function trackSearchQuery(query, productId = null) {
+            if (!query || query.trim().length < 2) return;
+            try {
+                const token = localStorage.getItem('token');
+                await fetch(`${BACKEND_URL}/api/products/track-search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ search_term: query.trim(), product_id: productId })
+                });
+            } catch (error) { console.error('Error tracking search:', error); }
+        }
+
+        function sortProductsByRating(products) {
+            return [...products].sort((a, b) => {
+                const ratingA = parseFloat(a.average_rating || 0);
+                const ratingB = parseFloat(b.average_rating || 0);
+                if (ratingA !== ratingB) return ratingB - ratingA;
+                return (parseInt(b.review_count || 0) - parseInt(a.review_count || 0));
+            });
+        }
+
+        async function loadProducts(page = 1, farmerIdForFilter = null) {
+            try {
+                const token = localStorage.getItem('token');
+                const sortBy = document.getElementById('quick-sort')?.value || 'top_rated';
+                
+                let url;
+                const targetFarmerId = farmerIdForFilter || currentFarmerId;
+                if (targetFarmerId) {
+                    url = `${BACKEND_URL}/api/products/farmer/${targetFarmerId}?page=${page}&limit=50`;
+                    document.getElementById('clear-farmer-filter').style.display = 'inline-flex';
+                } else {
+                    const category = document.getElementById('category-filter').value;
+                    const barangay = document.getElementById('barangay-filter').value;
+                    const minPrice = document.getElementById('min-price').value;
+                    const maxPrice = document.getElementById('max-price').value;
+                    url = `${BACKEND_URL}/api/products?page=${page}&limit=12`;
+                    if (category) url += `&category=${encodeURIComponent(category)}`;
+                    if (barangay) url += `&barangay=${encodeURIComponent(barangay)}`;
+                    if (minPrice) url += `&minPrice=${minPrice}`;
+                    if (maxPrice) url += `&maxPrice=${maxPrice}`;
+                    if (sortBy) url += `&sort=${sortBy}`;
+                    document.getElementById('clear-farmer-filter').style.display = 'none';
+                }
+                
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                
+                if (data.success) {
+                    let products = data.products || data.data || [];
+                    if (userRole === 'FARMER' && farmerProducts.size > 0 && !targetFarmerId) {
+                        products = products.filter(p => !farmerProducts.has(Number(p.product_id || p.id)));
+                    }
+                    if (sortBy === 'top_rated') products = sortProductsByRating(products);
+                    displayProducts(products);
+                    const pagination = data.pagination || { page: parseInt(page), pages: 1 };
+                    setupPagination(pagination);
+                } else {
+                    displayProducts([]);
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                displayProducts([]);
+            }
+        }
+
+        function expandSearchTerm(query) {
+            const lowerQuery = query.toLowerCase().trim();
+            const searchTerms = new Set([lowerQuery]);
+            for (const [key, value] of Object.entries(SYNONYMS)) {
+                if (lowerQuery === key || lowerQuery === value) {
+                    searchTerms.add(key);
+                    searchTerms.add(value);
+                }
+                if (lowerQuery.includes(key)) searchTerms.add(value);
+                if (lowerQuery.includes(value)) searchTerms.add(key);
+            }
+            return Array.from(searchTerms);
+        }
+
+        async function searchProducts(query) {
+            if (!query || !query.trim()) { loadProducts(); return; }
+            const originalQuery = query.trim();
+            const expandedTerms = expandSearchTerm(originalQuery);
+            await trackSearchQuery(originalQuery);
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/products/search?query=${encodeURIComponent(originalQuery)}&synonyms=${encodeURIComponent(expandedTerms.join(','))}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    let products = data.products || data.data || [];
+                    if (userRole === 'FARMER' && farmerProducts.size > 0) {
+                        products = products.filter(p => !farmerProducts.has(Number(p.product_id || p.id)));
+                    }
+                    displayProducts(products);
+                    document.getElementById('pagination').innerHTML = '';
+                }
+            } catch (error) { console.error('Error searching products:', error); }
+        }
+
+        function getFullImageUrl(imageUrl) {
+            if (!imageUrl) return '';
+            if (imageUrl.startsWith('http')) return imageUrl;
+            if (imageUrl.startsWith('/uploads')) return `${BACKEND_URL}${imageUrl}`;
+            return `${BACKEND_URL}/uploads/${imageUrl}`;
+        }
+
+        function getFallbackImage() {
+            return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23dcfce7\'/%3E%3Ccircle cx=\'100\' cy=\'70\' r=\'40\' fill=\'%2316a34a\' opacity=\'0.3\'/%3E%3Cpath d=\'M60 140 L140 140 L120 100 L80 100 L60 140\' fill=\'%2316a34a\' opacity=\'0.5\'/%3E%3C/svg%3E';
+        }
+
+        function generateFullStarRating(product) {
+            const avgRating = parseFloat(product.average_rating || 0);
+            const reviewCount = parseInt(product.review_count || 0);
+            if (reviewCount === 0) {
+                return `<div class="product-rating-minimal"><span class="rating-stars-minimal"><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></span><span class="rating-text-minimal no-reviews">No reviews yet</span></div>`;
+            }
+            const fullStars = Math.floor(avgRating);
+            const hasHalfStar = avgRating % 1 >= 0.5;
+            let starsHtml = '';
+            for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+            if (hasHalfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+            for (let i = starsHtml.length / 2; i < 5; i++) starsHtml += '<i class="far fa-star"></i>';
+            return `<div class="product-rating-minimal"><span class="rating-stars-minimal">${starsHtml}</span><span class="rating-text-minimal">${avgRating.toFixed(1)} (${reviewCount} reviews)</span></div>`;
+        }
+
+        function buyNow(productId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showNotification('Please login to continue', 'error');
+                window.location.href = '/auth/login.html';
+                return;
+            }
+
+            fetch(`${BACKEND_URL}/api/products/${productId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const product = data.product || data.data;
+                    if (product.stock === 0) {
+                        showNotification('This product is out of stock', 'error');
+                        return;
+                    }
+                    
+                    buyNowProduct = {
+                        product_id: product.product_id,
+                        product_name: product.product_name,
+                        price: parseFloat(product.price),
+                        unit: product.unit || 'kg',
+                        image_url: product.image_url,
+                        quantity: 1,
+                        stock: product.stock
+                    };
+                    showCheckoutModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching product:', error);
+                showNotification('Error loading product', 'error');
+            });
+        }
+
+        function showCheckoutModal() {
+            if (!buyNowProduct) return;
+            
+            const modal = document.getElementById('checkout-modal');
+            const content = document.getElementById('checkout-content');
+            const imageUrl = getFullImageUrl(buyNowProduct.image_url);
+            const subtotal = buyNowProduct.price * buyNowProduct.quantity;
+            
+            content.innerHTML = `
+                <div class="checkout-product-row">
+                    ${imageUrl ? 
+                        `<img src="${imageUrl}" alt="${buyNowProduct.product_name}" class="checkout-product-image">` : 
+                        `<div class="checkout-product-image" style="display: flex; align-items: center; justify-content: center; background: #dcfce7;"><i class="fas fa-seedling" style="color: #16a34a; font-size: 1.5rem;"></i></div>`
+                    }
+                    <div class="checkout-product-details">
+                        <div class="checkout-product-name">${buyNowProduct.product_name}</div>
+                        <div class="checkout-product-price">₱${buyNowProduct.price.toFixed(2)} / ${buyNowProduct.unit}</div>
+                    </div>
+                    <div class="checkout-quantity">
+                        <button class="qty-btn" onclick="updateCheckoutQuantity(-1)">−</button>
+                        <span class="qty-value" id="checkout-qty">${buyNowProduct.quantity}</span>
+                        <button class="qty-btn" onclick="updateCheckoutQuantity(1)">+</button>
+                    </div>
+                    <div class="checkout-item-total" id="checkout-item-total">
+                        ₱${subtotal.toFixed(2)}
+                    </div>
+                </div>
+                
+                <div class="checkout-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="checkout-subtotal">₱${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="checkout-total">₱${subtotal.toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                <div class="checkout-form-group">
+                    <label>Delivery Option</label>
+                    <select id="checkout-delivery-option">
+                        <option value="delivery">Home Delivery</option>
+                        <option value="pickup">Pickup at Farm</option>
+                    </select>
+                </div>
+                <div class="checkout-form-group">
+                    <label>Delivery Address</label>
+                    <input type="text" id="checkout-address" placeholder="Your complete address">
+                </div>
+                <div class="checkout-form-group">
+                    <label>Contact Number</label>
+                    <input type="tel" id="checkout-contact" placeholder="Your contact number">
+                </div>
+                <div class="checkout-form-group">
+                    <label>Payment Method</label>
+                    <select id="checkout-payment-method">
+                        <option value="COD">Cash on Delivery (COD)</option>
+                    </select>
+                </div>
+                
+                <div class="checkout-actions">
+                    <button class="btn btn-outline" onclick="closeCheckoutModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="placeBuyNowOrder()">Place Order</button>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        function updateCheckoutQuantity(change) {
+            if (!buyNowProduct) return;
+            const newQuantity = buyNowProduct.quantity + change;
+            if (newQuantity < 1) return;
+            if (newQuantity > buyNowProduct.stock) {
+                showNotification(`Only ${buyNowProduct.stock} ${buyNowProduct.unit} available`, 'error');
+                return;
+            }
+            buyNowProduct.quantity = newQuantity;
+            document.getElementById('checkout-qty').textContent = newQuantity;
+            const newTotal = buyNowProduct.price * newQuantity;
+            document.getElementById('checkout-item-total').innerHTML = `₱${newTotal.toFixed(2)}`;
+            document.getElementById('checkout-subtotal').innerHTML = `₱${newTotal.toFixed(2)}`;
+            document.getElementById('checkout-total').innerHTML = `₱${newTotal.toFixed(2)}`;
+        }
+
+        async function placeBuyNowOrder() {
+            const deliveryOption = document.getElementById('checkout-delivery-option')?.value || 'delivery';
+            const address = document.getElementById('checkout-address')?.value;
+            const contactNumber = document.getElementById('checkout-contact')?.value;
+            const paymentMethod = document.getElementById('checkout-payment-method')?.value || 'COD';
+            
+            if (!address) {
+                showNotification('Please enter your address', 'error');
+                return;
+            }
+            if (!contactNumber) {
+                showNotification('Please enter your contact number', 'error');
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            const placeOrderBtn = document.querySelector('#checkout-modal .btn-primary');
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                const cartResponse = await fetch(`${BACKEND_URL}/api/cart/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ product_id: buyNowProduct.product_id, quantity: buyNowProduct.quantity })
+                });
+                const cartData = await cartResponse.json();
+                if (!cartData.success) throw new Error(cartData.error || 'Failed to add to cart');
+                
+                const checkoutResponse = await fetch(`${BACKEND_URL}/api/cart/checkout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        delivery_option: deliveryOption,
+                        address: address,
+                        contact_number: contactNumber,
+                        payment_method: paymentMethod
+                    })
+                });
+                const checkoutData = await checkoutResponse.json();
+                
+                if (checkoutData.success) {
+                    showNotification('Order placed successfully!');
+                    closeCheckoutModal();
+                    buyNowProduct = null;
+                    updateCartCount();
+                    window.location.href = '/customer/orders.html';
+                } else {
+                    throw new Error(checkoutData.error || 'Checkout failed');
+                }
+            } catch (error) {
+                console.error('Order error:', error);
+                showNotification(error.message, 'error');
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.innerHTML = 'Place Order';
+            }
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').style.display = 'none';
+            buyNowProduct = null;
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('products-container');
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="empty-state">No products found</div>';
+                return;
+            }
+            
+            container.innerHTML = products.map(product => {
+                const imageUrl = getFullImageUrl(product.image_url);
+                const status = product.status ? product.status.toUpperCase() : '';
+                const stock = parseInt(product.stock) || 0;
+                const isAvailable = status === 'AVAILABLE' && stock > 0;
+                const productName = product.product_name || 'Product';
+                const farmName = product.farm_name || 'Local Farmer';
+                const farmerId = product.farmer_id;
+                const barangay = product.barangay || 'Zone 1';
+                const price = parseFloat(product.price).toFixed(2);
+                const category = product.category || 'Fresh Produce';
+                const description = product.description || 'Fresh from the farm.';
+                const productId = product.product_id;
+                const unit = product.unit || 'kg';
+                
+                let stockClass = '', stockIcon = 'fa-boxes', stockText = `${stock} ${unit} available`;
+                if (stock === 0) {
+                    stockClass = 'out-of-stock';
+                    stockIcon = 'fa-times-circle';
+                    stockText = 'Out of stock';
+                } else if (stock <= 5) {
+                    stockClass = 'low-stock';
+                    stockIcon = 'fa-exclamation-triangle';
+                    stockText = `Only ${stock} ${unit} left`;
+                }
+                
+                return `
+                    <div class="product-card-marketplace" data-id="${productId}">
+                        <div class="product-image">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${productName}" onerror="this.src='${getFallbackImage()}';">` : `<div class="image-fallback"><i class="fas fa-seedling"></i></div>`}
+                            ${!isAvailable ? '<span class="status-badge">OUT OF STOCK</span>' : ''}
+                        </div>
+                        <div class="product-info">
+                            <div class="product-header">
+                                <span class="product-category">${category}</span>
+                            </div>
+                            <h3 class="product-title">${productName}</h3>
+                            ${generateFullStarRating(product)}
+                            <p class="product-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
+                            
+                            <div class="farmer-info-minimal" onclick="viewFarmerProfile(${farmerId})">
+                                <div class="farmer-avatar-minimal"><i class="fas fa-tractor"></i></div>
+                                <div class="farmer-details-minimal">
+                                    <span class="farmer-name-minimal">${farmName}</span>
+                                    <span class="farmer-location-minimal"><i class="fas fa-map-marker-alt"></i> ${barangay}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="product-footer-minimal">
+                                <div class="price-section-minimal">
+                                    <span class="price-minimal">₱${price}<span class="price-unit-minimal">/${unit}</span></span>
+                                    <span class="stock-minimal ${stockClass}"><i class="fas ${stockIcon}"></i> ${stockText}</span>
+                                </div>
+                                <div class="action-buttons-minimal">
+                                    <button class="action-btn" onclick="quickView(${productId})" title="Quick view"><i class="fas fa-eye"></i> View</button>
+                                    <button class="action-btn cart-btn" onclick="addToCart(${productId})" ${!isAvailable ? 'disabled' : ''} title="Add to cart"><i class="fas fa-cart-plus"></i> Cart</button>
+                                    <button class="action-btn buy-now-btn" onclick="buyNow(${productId})" ${!isAvailable ? 'disabled' : ''} title="Buy Now"><i class="fas fa-bolt"></i> Buy Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupEventListeners() {
+            document.getElementById('search-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') searchProducts(e.target.value); });
+            document.getElementById('search-input').addEventListener('input', debounce((e) => { if (e.target.value.length > 2) searchProducts(e.target.value); else if (e.target.value.length === 0) loadProducts(); }, 500));
+            document.getElementById('filterToggleBtn').addEventListener('click', () => document.getElementById('filtersPanel').classList.toggle('show'));
+            document.getElementById('apply-filters').addEventListener('click', () => loadProducts(1));
+            document.getElementById('clear-filters').addEventListener('click', clearFilters);
+            document.getElementById('clear-farmer-filter')?.addEventListener('click', clearFarmerFilter);
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('category-filter').value = this.dataset.category === 'all' ? '' : this.dataset.category;
+                    loadProducts(1);
+                });
+            });
+            document.getElementById('becomeSellerBtn').addEventListener('click', () => {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                if (user.role === 'FARMER') window.location.href = '/farmer/dashboard.html';
+                else if (confirm('Register as a seller?')) window.location.href = '/auth/register-farmer.html';
+            });
+            document.querySelector('.logout-btn').addEventListener('click', (e) => { e.preventDefault(); logout(); });
+            document.getElementById('quick-sort')?.addEventListener('change', () => loadProducts(1));
+            document.getElementById('quick-view-close')?.addEventListener('click', () => document.getElementById('quick-view-modal').style.display = 'none');
+            document.getElementById('farmer-profile-close')?.addEventListener('click', () => document.getElementById('farmer-profile-modal').style.display = 'none');
+            document.getElementById('checkout-modal-close')?.addEventListener('click', closeCheckoutModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('quick-view-modal')) document.getElementById('quick-view-modal').style.display = 'none';
+                if (e.target === document.getElementById('farmer-profile-modal')) document.getElementById('farmer-profile-modal').style.display = 'none';
+                if (e.target === document.getElementById('checkout-modal')) closeCheckoutModal();
+            });
+        }
+
+        function initDropdown() {
+            const userToggle = document.getElementById('userToggle');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (userToggle && dropdownMenu) {
+                const newToggle = userToggle.cloneNode(true);
+                userToggle.parentNode.replaceChild(newToggle, userToggle);
+                newToggle.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); dropdownMenu.classList.toggle('show'); });
+                document.addEventListener('click', (e) => { if (!newToggle.contains(e.target) && !dropdownMenu.contains(e.target)) dropdownMenu.classList.remove('show'); });
+            }
+            
+            const notifToggle = document.getElementById('notificationToggle');
+            const notifMenu = document.getElementById('notificationMenu');
+            if (notifToggle && notifMenu) {
+                const newNotifToggle = notifToggle.cloneNode(true);
+                notifToggle.parentNode.replaceChild(newNotifToggle, notifToggle);
+                
+                newNotifToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    notifMenu.classList.toggle('show');
+                    if (notifMenu.classList.contains('show')) {
+                        loadNotifications();
+                    }
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!newNotifToggle.contains(e.target) && !notifMenu.contains(e.target)) {
+                        notifMenu.classList.remove('show');
+                    }
+                });
+            }
+        }
+
+        async function fetchFarmerProducts(token) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/products/farmer/products`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (response.ok) {
+                    const data = await response.json();
+                    (data.products || []).forEach(p => { if (p.product_id) farmerProducts.add(Number(p.product_id)); });
+                }
+            } catch (error) { console.warn('Error fetching farmer products:', error); }
+        }
+
+        async function quickView(productId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/products/${productId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success) {
+                    const product = data.product || data.data;
+                    const modal = document.getElementById('quick-view-modal');
+                    const content = document.getElementById('quick-view-content');
+                    const imageUrl = getFullImageUrl(product.image_url);
+                    const stock = parseInt(product.stock) || 0;
+                    const isAvailable = product.status === 'AVAILABLE' && stock > 0;
+                    content.innerHTML = `
+                        <div class="quick-view-content">
+                            <div class="quick-view-image">${imageUrl ? `<img src="${imageUrl}" alt="${product.product_name}">` : '<div class="image-fallback"><i class="fas fa-seedling"></i></div>'}</div>
+                            <div class="quick-view-info">
+                                <h2>${product.product_name}</h2>
+                                <span class="product-category">${product.category}</span>
+                                ${generateFullStarRating(product)}
+                                <p class="product-description">${product.description || 'Fresh from the farm.'}</p>
+                                <div class="farmer-info-minimal" onclick="viewFarmerProfile(${product.farmer_id})" style="margin: 0.5rem 0; padding: 0.75rem; background: #f9fafb; border-radius: 8px;"><div class="farmer-avatar-minimal"><i class="fas fa-tractor"></i></div><div class="farmer-details-minimal"><span class="farmer-name-minimal">${product.farm_name || 'Local Farmer'}</span><span class="farmer-location-minimal"><i class="fas fa-map-marker-alt"></i> ${product.barangay || 'Zone 1'}</span></div></div>
+                                <div class="quick-view-price">₱${parseFloat(product.price).toFixed(2)} <span class="price-unit">/${product.unit || 'kg'}</span></div>
+                                <div class="quick-view-actions">
+                                    <button class="btn btn-outline" onclick="addToCart(${product.product_id})" ${!isAvailable ? 'disabled' : ''}><i class="fas fa-cart-plus"></i> Add to Cart</button>
+                                    <button class="btn btn-primary" onclick="buyNow(${product.product_id}); document.getElementById('quick-view-modal').style.display = 'none';" ${!isAvailable ? 'disabled' : ''}><i class="fas fa-bolt"></i> Buy Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    modal.style.display = 'flex';
+                }
+            } catch (error) { console.error('Error loading product:', error); showNotification('Error loading product details', 'error'); }
+        }
+
+        async function viewFarmerProfile(farmerId) {
+            if (!farmerId) { 
+                showNotification('Farmer information not available', 'error'); 
+                return; 
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const modal = document.getElementById('farmer-profile-modal');
+                const content = document.getElementById('farmer-profile-content');
+                
+                content.innerHTML = '<div class="loading" style="padding: 2rem; text-align: center;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+                modal.style.display = 'flex';
+                
+                const farmerResponse = await fetch(`${BACKEND_URL}/api/farmers/${farmerId}`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const farmerData = await farmerResponse.json();
+                const farmer = farmerData.farmer || farmerData.data || farmerData;
+                
+                if (!farmer || !farmer.farm_name) {
+                    throw new Error('Farmer data not found');
+                }
+                
+                const productsResponse = await fetch(`${BACKEND_URL}/api/products/farmer/${farmerId}?limit=20`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const productsData = await productsResponse.json();
+                const allProducts = productsData.products || productsData.data || [];
+                const productCount = allProducts.length;
+                const previewProducts = allProducts.slice(0, 3);
+                
+                function escape(str) {
+                    if (!str) return '';
+                    return str.replace(/[&<>]/g, function(m) {
+                        if (m === '&') return '&amp;';
+                        if (m === '<') return '&lt;';
+                        if (m === '>') return '&gt;';
+                        return m;
+                    });
+                }
+                
+                let productsPreviewHtml = '';
+                if (previewProducts.length > 0) {
+                    productsPreviewHtml = `
+                        <div class="products-preview">
+                            <div class="products-preview-title">
+                                <i class="fas fa-box"></i>
+                                <span>Products (${productCount})</span>
+                            </div>
+                            <div class="preview-products-list">
+                                ${previewProducts.map(product => `
+                                    <div class="preview-product-item" onclick="quickView(${product.product_id}); document.getElementById('farmer-profile-modal').style.display = 'none';">
+                                        <div class="preview-product-img">
+                                            ${product.image_url ? `<img src="${getFullImageUrl(product.image_url)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-seedling\'></i>'">` : '<i class="fas fa-seedling"></i>'}
+                                        </div>
+                                        <div class="preview-product-details">
+                                            <div class="preview-product-name">${escape(product.product_name || 'Product')}</div>
+                                            <div class="preview-product-price">₱${parseFloat(product.price || 0).toFixed(2)}</div>
+                                        </div>
+                                        <i class="fas fa-chevron-right" style="color: #9ca3af; font-size: 0.7rem;"></i>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${productCount > 3 ? `
+                                <div class="view-more-link" onclick="viewAllFarmerProducts(${farmerId}, '${escape(farmer.farm_name || 'Farmer').replace(/'/g, "\\'")}')">
+                                    View all ${productCount} products <i class="fas fa-arrow-right"></i>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                } else {
+                    productsPreviewHtml = `
+                        <div class="products-preview">
+                            <div class="products-preview-title">
+                                <i class="fas fa-box"></i>
+                                <span>No products yet</span>
+                            </div>
+                            <div class="farmer-description" style="text-align: center; background: #f9fafb; margin-top: 8px;">
+                                <p>This farmer hasn't added any products yet.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                content.innerHTML = `
+                    <div class="farmer-profile-container">
+                        <div class="farmer-header">
+                            <div class="farmer-avatar">
+                                <i class="fas fa-tractor"></i>
+                            </div>
+                            <div class="farmer-info">
+                                <div class="farmer-name">${escape(farmer.full_name || farmer.name || 'Farmer')}</div>
+                                <div class="farmer-farm">
+                                    <i class="fas fa-store"></i> ${escape(farmer.farm_name || 'Farm Name')}
+                                </div>
+                                <div class="farmer-location">
+                                    <i class="fas fa-map-marker-alt"></i> ${escape(farmer.barangay || 'Location not specified')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-count-badge">
+                            <i class="fas fa-box"></i>
+                            <span>${productCount} product${productCount !== 1 ? 's' : ''}</span>
+                        </div>
+                        
+                        <div class="farmer-contact">
+                            <i class="fas fa-phone"></i>
+                            <span>${escape(farmer.contact_number || 'Not provided')}</span>
+                        </div>
+                        
+                        <div class="farmer-description">
+                            <p>${escape(farmer.farm_description || 'No description available.')}</p>
+                        </div>
+                        
+                        ${productsPreviewHtml}
+                        
+                        <div class="modal-buttons">
+                            <button class="btn-action btn-action-outline" onclick="document.getElementById('farmer-profile-modal').style.display = 'none'">
+                                Close
+                            </button>
+                            <button class="btn-action btn-action-primary" onclick="viewAllFarmerProducts(${farmerId}, '${escape(farmer.farm_name || 'Farmer').replace(/'/g, "\\'")}')">
+                                View All Products
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading farmer profile:', error);
+                showNotification('Failed to load farmer profile', 'error');
+                document.getElementById('farmer-profile-modal').style.display = 'none';
+            }
+        }
+
+        function viewAllFarmerProducts(farmerId, farmName) {
+            document.getElementById('farmer-profile-modal').style.display = 'none';
+            currentFarmerId = farmerId;
+            currentFarmerName = farmName;
+            document.getElementById('category-filter').value = '';
+            document.getElementById('barangay-filter').value = '';
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            document.getElementById('search-input').value = '';
+            const mobileSearch = document.getElementById('mobile-search-input');
+            if (mobileSearch) mobileSearch.value = '';
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.category-btn.all-btn').classList.add('active');
+            showNotification(`Showing products from ${currentFarmerName}`, 'info');
+            loadProducts(1, farmerId);
+        }
+
+        function filterByFarmer(farmerId, farmName) {
+            viewAllFarmerProducts(farmerId, farmName);
+        }
+
+        function clearFarmerFilter() {
+            currentFarmerId = null;
+            currentFarmerName = '';
+            document.getElementById('clear-farmer-filter').style.display = 'none';
+            loadProducts(1);
+            showNotification('Showing all products', 'info');
+        }
+
+        async function addToCart(productId) {
+            try {
+                const token = localStorage.getItem('token');
+                const productResponse = await fetch(`${BACKEND_URL}/api/products/${productId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const productData = await productResponse.json();
+                const product = productData.product || productData.data || {};
+                if (parseInt(product.stock) === 0) { showNotification('Out of stock', 'error'); return; }
+                const response = await fetch(`${BACKEND_URL}/api/cart/add`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ product_id: productId, quantity: 1 })
+                });
+                const data = await response.json();
+                if (data.success) { showNotification(`✅ ${product.product_name || 'Product'} added to cart!`); updateCartCount(); }
+                else showNotification(data.error || 'Failed to add to cart', 'error');
+            } catch (error) { console.error('Error adding to cart:', error); showNotification('Failed to add to cart', 'error'); }
+        }
+
+        function clearFilters() {
+            document.getElementById('category-filter').value = '';
+            document.getElementById('barangay-filter').value = '';
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            document.getElementById('search-input').value = '';
+            const mobileSearch = document.getElementById('mobile-search-input');
+            if (mobileSearch) mobileSearch.value = '';
+            currentFarmerId = null;
+            document.getElementById('clear-farmer-filter').style.display = 'none';
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.category-btn.all-btn').classList.add('active');
+            loadProducts(1);
+        }
+
+        function setupPagination(pagination) {
+            const container = document.getElementById('pagination');
+            if (!pagination || pagination.pages <= 1) { container.innerHTML = ''; return; }
+            let html = '<div class="pagination">';
+            if (pagination.page > 1) html += `<button class="page-btn" onclick="loadProducts(${pagination.page - 1})">←</button>`;
+            for (let i = 1; i <= pagination.pages; i++) html += `<button class="page-btn ${i === pagination.page ? 'active' : ''}" onclick="loadProducts(${i})">${i}</button>`;
+            if (pagination.page < pagination.pages) html += `<button class="page-btn" onclick="loadProducts(${pagination.page + 1})">→</button>`;
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        async function updateCartCount() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/cart/count`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success) {
+                    const count = data.count || 0;
+                    document.getElementById('cart-count').textContent = count;
+                    document.getElementById('cart-count').style.display = count > 0 ? 'inline' : 'none';
+                }
+            } catch (error) { console.error('Error updating cart count:', error); }
+        }
+
+        async function updateOrdersBadge() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/orders/my-purchases`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success) {
+                    const orders = data.orders || [];
+                    const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes((o.status || '').toLowerCase())).length;
+                    const badge = document.getElementById('orders-badge');
+                    if (badge) {
+                        badge.textContent = activeOrders > 9 ? '9+' : activeOrders;
+                        badge.style.display = activeOrders > 0 ? 'inline' : 'none';
+                    }
+                }
+            } catch (error) { console.error('Error updating orders badge:', error); }
+        }
+
+        async function viewProductReviews(productId, productName) {
+            document.getElementById('view-reviews-product-info').innerHTML = `<h3 style="margin: 0;">${productName}</h3>`;
+            document.getElementById('view-reviews-modal').style.display = 'flex';
+            document.getElementById('reviews-container').innerHTML = '<div class="loading">Loading reviews...</div>';
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/feedback/product/${productId}`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
+                const data = await response.json();
+                if (data.success && data.feedback && data.feedback.length > 0) {
+                    document.getElementById('reviews-container').innerHTML = data.feedback.map(item => `
+                        <div class="review-item"><div class="review-header"><div class="reviewer-info"><div class="reviewer-avatar"><i class="fas fa-user"></i></div><div><div class="reviewer-name">${item.customer_name || 'Customer'}</div><div class="review-date">${new Date(item.created_at).toLocaleDateString()}</div></div></div><div class="review-rating">${generateStarSummary(item.rating)}</div></div>${item.comment ? `<p class="review-comment">${item.comment}</p>` : ''}</div>
+                    `).join('');
+                } else {
+                    document.getElementById('reviews-container').innerHTML = '<div class="empty-state">No reviews yet</div>';
+                }
+            } catch (error) { console.error('Error loading reviews:', error); document.getElementById('reviews-container').innerHTML = '<div class="empty-state">Error loading reviews</div>'; }
+        }
+
+        function generateStarSummary(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) stars += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+            return stars;
+        }
+
+        function closeViewReviewsModal() { document.getElementById('view-reviews-modal').style.display = 'none'; }
+
+        async function loadPersonalizedRecommendations() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/recommendations/personalized`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success && data.recommendations) {
+                    const hasAny = Object.values(data.recommendations).some(arr => arr && arr.length > 0);
+                    if (hasAny) {
+                        document.getElementById('recommendations-section').style.display = 'block';
+                        const container = document.getElementById('recommendations-container');
+                        let products = data.recommendations.trending_products || data.recommendations.recently_viewed || [];
+                        if (products.length) {
+                            container.innerHTML = products.map(product => `
+                                <div class="product-card-marketplace" data-id="${product.product_id}">
+                                    <div class="product-image">${getFullImageUrl(product.image_url) ? `<img src="${getFullImageUrl(product.image_url)}" alt="${product.product_name}">` : '<div class="image-fallback"><i class="fas fa-seedling"></i></div>'}</div>
+                                    <div class="product-info"><h3 class="product-title">${product.product_name}</h3><div class="product-footer-minimal"><span class="price-minimal">₱${parseFloat(product.price).toFixed(2)}<span class="price-unit-minimal">/${product.unit || 'kg'}</span></span><button class="action-btn cart-btn" onclick="addToCart(${product.product_id})"><i class="fas fa-cart-plus"></i></button></div></div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                }
+            } catch (error) { console.error('Error loading recommendations:', error); }
+        }
+
+        let notifications = [], unreadCount = 0, notificationCheckInterval = null;
+        let activeToasts = [];
+
+        function showNotification(message, type = 'success', duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            
+            let iconHtml = '';
+            switch(type) {
+                case 'success': iconHtml = '<i class="fas fa-check-circle"></i>'; break;
+                case 'error': iconHtml = '<i class="fas fa-exclamation-circle"></i>'; break;
+                case 'warning': iconHtml = '<i class="fas fa-exclamation-triangle"></i>'; break;
+                default: iconHtml = '<i class="fas fa-info-circle"></i>';
+            }
+            
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <div class="toast-icon">${iconHtml}</div>
+                    <div class="toast-message">${escapeHtml(message)}</div>
+                    <button class="toast-close"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            activeToasts.push(toast);
+            
+            const topOffset = 80 + ((activeToasts.length - 1) * 70);
+            toast.style.top = `${topOffset}px`;
+            toast.style.right = '20px';
+            
+            const closeBtn = toast.querySelector('.toast-close');
+            closeBtn.addEventListener('click', () => removeToast(toast));
+            
+            toast.timeout = setTimeout(() => removeToast(toast), duration);
+            
+            toast.addEventListener('mouseenter', () => clearTimeout(toast.timeout));
+            toast.addEventListener('mouseleave', () => { toast.timeout = setTimeout(() => removeToast(toast), 1500); });
+        }
+        
+        function removeToast(toast) {
+            toast.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                toast.remove();
+                const index = activeToasts.indexOf(toast);
+                if (index > -1) activeToasts.splice(index, 1);
+                repositionToasts();
+            }, 300);
+        }
+        
+        function repositionToasts() {
+            activeToasts.forEach((toast, idx) => { toast.style.top = `${80 + (idx * 70)}px`; });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function loadNotifications() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/notifications?limit=20`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success) {
+                    notifications = data.notifications || [];
+                    unreadCount = notifications.filter(n => !n.is_read).length;
+                    updateNotificationBadge();
+                    renderNotificationList();
+                }
+            } catch (error) { console.error('Error loading notifications:', error); }
+        }
+
+        function renderNotificationList() {
+            const list = document.getElementById('notificationList');
+            if (!list) return;
+            if (notifications.length === 0) { list.innerHTML = '<div class="notification-empty">No notifications</div>'; return; }
+            list.innerHTML = notifications.map(n => `
+                <div class="notification-item ${n.is_read ? '' : 'unread'}" data-id="${n.id}">
+                    <div class="notification-icon" onclick="markAsRead(${n.id})"><i class="fas fa-bell"></i></div>
+                    <div class="notification-content" onclick="markAsRead(${n.id})"><p>${escapeHtml(n.message)}</p><span class="notification-time">${new Date(n.created_at).toLocaleString()}</span></div>
+                    <button class="notification-delete" onclick="deleteNotification(${n.id}, event)" title="Delete"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (unreadCount > 0) { badge.textContent = unreadCount > 9 ? '9+' : unreadCount; badge.style.display = 'inline-flex'; }
+            else badge.style.display = 'none';
+        }
+
+        async function markAsRead(notificationId) {
+            try {
+                const token = localStorage.getItem('token');
+                await fetch(`${BACKEND_URL}/api/notifications/${notificationId}/read`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+                const notif = notifications.find(n => n.id === notificationId);
+                if (notif && !notif.is_read) { notif.is_read = true; unreadCount--; updateNotificationBadge(); renderNotificationList(); }
+            } catch (error) { console.error('Error marking as read:', error); }
+        }
+
+        async function deleteNotification(notificationId, event) {
+            if (event) event.stopPropagation();
+            if (!confirm('Delete this notification?')) return;
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/notifications/${notificationId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success) {
+                    const index = notifications.findIndex(n => n.id === notificationId);
+                    if (index !== -1) {
+                        if (!notifications[index].is_read) unreadCount--;
+                        notifications.splice(index, 1);
+                        updateNotificationBadge();
+                        renderNotificationList();
+                    }
+                    showNotification('Notification deleted');
+                }
+            } catch (error) { console.error('Error deleting notification:', error); }
+        }
+
+        async function deleteAllNotifications() {
+            if (!confirm('Delete all notifications?')) return;
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/notifications/delete-all`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (data.success) { notifications = []; unreadCount = 0; updateNotificationBadge(); renderNotificationList(); showNotification(`Deleted ${data.count} notifications`); }
+            } catch (error) { console.error('Error deleting all notifications:', error); }
+        }
+
+        async function markAllAsRead() {
+            try {
+                const token = localStorage.getItem('token');
+                await fetch(`${BACKEND_URL}/api/notifications/mark-all-read`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+                notifications.forEach(n => n.is_read = true);
+                unreadCount = 0;
+                updateNotificationBadge();
+                renderNotificationList();
+                showNotification('All notifications marked as read');
+            } catch (error) { console.error('Error marking all as read:', error); }
+        }
+
+        function attachNotificationEventListeners() {
+            const markAllReadBtn = document.getElementById('markAllRead');
+            const deleteAllBtn = document.getElementById('deleteAllNotifications');
+            if (markAllReadBtn) {
+                const newMarkAllRead = markAllReadBtn.cloneNode(true);
+                markAllReadBtn.parentNode.replaceChild(newMarkAllRead, markAllReadBtn);
+                newMarkAllRead.addEventListener('click', (e) => { e.stopPropagation(); markAllAsRead(); });
+            }
+            if (deleteAllBtn) {
+                const newDeleteAll = deleteAllBtn.cloneNode(true);
+                deleteAllBtn.parentNode.replaceChild(newDeleteAll, deleteAllBtn);
+                newDeleteAll.addEventListener('click', (e) => { e.stopPropagation(); deleteAllNotifications(); });
+            }
+        }
+
+        function startNotificationPolling() { 
+            loadNotifications(); 
+            attachNotificationEventListeners();
+            notificationCheckInterval = setInterval(loadNotifications, 30000); 
+        }
+        
+        function stopNotificationPolling() { if (notificationCheckInterval) clearInterval(notificationCheckInterval); }
+
+        function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; }
+
+        function logout() { stopNotificationPolling(); localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }
+    </script>
+</body>
+</html>

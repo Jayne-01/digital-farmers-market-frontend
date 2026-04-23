@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNN Image Classifier Test - Digital Farmers Market</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #374151;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f5f3ff;
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .result-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .result-status.valid {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .result-status.invalid {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .confidence-bar-container {
+            background: #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .confidence-bar {
+            height: 24px;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+
+        .confidence-bar.low {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .confidence-bar.medium {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .confidence-bar.high {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .probability-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .probability-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        .probability-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .api-status {
+            background: #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-dot.online {
+            background: #10b981;
+            box-shadow: 0 0 5px #10b981;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-brain"></i> 
+                CNN Image Classifier Test
+            </h1>
+            <p>Test the AI-powered image classification for your farm products</p>
+        </div>
+
+        <!-- API Status Card -->
+        <div class="card">
+            <h2>
+                <i class="fas fa-server"></i> 
+                System Status
+            </h2>
+            <div class="api-status">
+                <span>
+                    <span class="status-dot" id="classifierStatusDot"></span>
+                    <strong>Classifier API:</strong> 
+                    <span id="classifierStatus">Checking...</span>
+                </span>
+                <span>
+                    <strong>Port:</strong> 5002
+                </span>
+            </div>
+            <div class="api-status">
+                <span>
+                    <span class="status-dot" id="backendStatusDot"></span>
+                    <strong>Main Backend:</strong> 
+                    <span id="backendStatus">Checking...</span>
+                </span>
+                <span>
+                    <strong>Port:</strong> 5000
+                </span>
+            </div>
+            <div class="api-status">
+                <span>
+                    <span class="status-dot" id="frontendStatusDot"></span>
+                    <strong>Frontend:</strong> 
+                    <span id="frontendStatus">Online</span>
+                </span>
+                <span>
+                    <strong>Port:</strong> 3000
+                </span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>
+                <i class="fas fa-image"></i> 
+                Test Image Classification
+            </h2>
+            
+            <div class="form-group">
+                <label for="category">Select Category to Validate Against (Optional)</label>
+                <select id="category">
+                    <option value="">Just Classify (No validation)</option>
+                    <option value="fruits">🍎 Fruits</option>
+                    <option value="vegetables">🥕 Vegetables</option>
+                    <option value="crops">🌽 Crops</option>
+                    <option value="rice">🍚 Rice</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="image-upload-area" id="imageUploadArea">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #9ca3af;"></i>
+                    <p style="margin-top: 0.5rem;">Click or drag image here</p>
+                    <small>Supports: JPG, PNG, GIF (Max 10MB)</small>
+                </div>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                <div id="imagePreview" class="image-preview"></div>
+            </div>
+
+            <div class="button-group">
+                <button onclick="checkHealth()" id="healthBtn">
+                    <i class="fas fa-heartbeat"></i> Check Health
+                </button>
+                <button onclick="classifyOnly()" id="classifyBtn" disabled>
+                    <i class="fas fa-chart-line"></i> Classify Only
+                </button>
+                <button onclick="validateWithCategory()" id="validateBtn" disabled>
+                    <i class="fas fa-check-circle"></i> Validate Against Category
+                </button>
+                <button onclick="clearAll()" style="background: #6b7280;">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="card" id="resultCard" style="display: none;">
+            <h2>
+                <i class="fas fa-chart-pie"></i> 
+                Classification Results
+            </h2>
+            <div id="resultContent"></div>
+        </div>
+
+        <div class="card">
+            <h2>
+                <i class="fas fa-info-circle"></i> 
+                About This Classifier
+            </h2>
+            <div style="color: #4b5563; line-height: 1.6;">
+                <p><strong>Model:</strong> MobileNetV2 Transfer Learning</p>
+                <p><strong>Categories:</strong> Fruits, Vegetables, Crops, Rice</p>
+                <p><strong>Training Data:</strong> 66 images (45 train, 8 validation, 13 test)</p>
+                <p><strong>Test Accuracy:</strong> 69.23%</p>
+                <hr style="margin: 1rem 0;">
+                <p><small>💡 <strong>Tip:</strong> For best results, upload clear, well-lit images of a single product. The classifier works best with images similar to the training data.</small></p>
+                <p><small>🔧 <strong>Services:</strong><br>
+                - Backend API: http://localhost:5000<br>
+                - CNN Classifier: http://localhost:5002<br>
+                - Frontend: http://localhost:3000</small></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: Backend runs on port 5000, Classifier on port 5002, Frontend on port 3000
+        const BACKEND_URL = 'http://localhost:5000';
+        const CLASSIFIER_URL = 'http://localhost:5002';
+        let selectedFile = null;
+
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+
+        // Check API status on load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkClassifierHealth();
+            checkBackendHealth();
+            setupImageUpload();
+            
+            // Check if user is logged in
+            if (!token) {
+                showNotification('⚠️ Please login first to test classification', 'warning');
+                document.getElementById('classifyBtn').disabled = true;
+                document.getElementById('validateBtn').disabled = true;
+            }
+        });
+
+        async function checkClassifierHealth() {
+            try {
+                const response = await fetch(`${CLASSIFIER_URL}/classify/health`);
+                const data = await response.json();
+                document.getElementById('classifierStatus').innerHTML = 'Online';
+                document.getElementById('classifierStatusDot').className = 'status-dot online';
+            } catch (error) {
+                document.getElementById('classifierStatus').innerHTML = 'Offline (start: python app.py)';
+                document.getElementById('classifierStatusDot').className = 'status-dot offline';
+                showNotification('Classifier is not running! Start it with: python app.py', 'error');
+            }
+        }
+
+        async function checkBackendHealth() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`);
+                const data = await response.json();
+                document.getElementById('backendStatus').innerHTML = 'Online';
+                document.getElementById('backendStatusDot').className = 'status-dot online';
+            } catch (error) {
+                document.getElementById('backendStatus').innerHTML = 'Offline (start: node app.js)';
+                document.getElementById('backendStatusDot').className = 'status-dot offline';
+                showNotification('Backend is not running! Start it with: node app.js', 'error');
+            }
+        }
+
+        function setupImageUpload() {
+            const uploadArea = document.getElementById('imageUploadArea');
+            const fileInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#667eea';
+                uploadArea.style.background = '#f5f3ff';
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#d1d5db';
+                uploadArea.style.background = '#f9fafb';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handleImageFile(file);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    handleImageFile(e.target.files[0]);
+                }
+            });
+        }
+
+        function handleImageFile(file) {
+            selectedFile = file;
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+            
+            // Hide result card
+            document.getElementById('resultCard').style.display = 'none';
+            
+            // Enable buttons
+            document.getElementById('classifyBtn').disabled = false;
+            document.getElementById('validateBtn').disabled = false;
+        }
+
+        async function checkHealth() {
+            await checkClassifierHealth();
+            await checkBackendHealth();
+        }
+
+        async function classifyOnly() {
+            if (!selectedFile) {
+                alert('Please select an image first');
+                return;
+            }
+
+            const classifyBtn = document.getElementById('classifyBtn');
+            const resultCard = document.getElementById('resultCard');
+            const resultContent = document.getElementById('resultContent');
+            
+            classifyBtn.disabled = true;
+            classifyBtn.innerHTML = '<span class="loading-spinner"></span> Classifying...';
+            resultCard.style.display = 'block';
+            resultContent.innerHTML = '<div class="loading-spinner"></div> AI is analyzing the image...';
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/classify`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayClassificationResult(result);
+                } else {
+                    throw new Error(result.error || 'Classification failed');
+                }
+            } catch (error) {
+                console.error('Classification error:', error);
+                resultContent.innerHTML = `
+                    <div class="result-status invalid">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <small>Make sure both services are running:<br>
+                        - Backend: http://localhost:5000<br>
+                        - Classifier: http://localhost:5002</small>
+                    </div>
+                `;
+            } finally {
+                classifyBtn.disabled = false;
+                classifyBtn.innerHTML = '<i class="fas fa-chart-line"></i> Classify Only';
+            }
+        }
+
+        async function validateWithCategory() {
+            const category = document.getElementById('category').value;
+            
+            if (!selectedFile) {
+                alert('Please select an image first');
+                return;
+            }
+            
+            if (!category) {
+                alert('Please select a category to validate against');
+                return;
+            }
+
+            const validateBtn = document.getElementById('validateBtn');
+            const resultCard = document.getElementById('resultCard');
+            const resultContent = document.getElementById('resultContent');
+            
+            validateBtn.disabled = true;
+            validateBtn.innerHTML = '<span class="loading-spinner"></span> Validating...';
+            resultCard.style.display = 'block';
+            resultContent.innerHTML = '<div class="loading-spinner"></div> AI is validating the image...';
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            formData.append('expectedCategory', category);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/validate-product`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayValidationResult(result, category);
+                } else {
+                    throw new Error(result.error || 'Validation failed');
+                }
+            } catch (error) {
+                console.error('Validation error:', error);
+                resultContent.innerHTML = `
+                    <div class="result-status invalid">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <small>Make sure both services are running:<br>
+                        - Backend: http://localhost:5000<br>
+                        - Classifier: http://localhost:5002</small>
+                    </div>
+                `;
+            } finally {
+                validateBtn.disabled = false;
+                validateBtn.innerHTML = '<i class="fas fa-check-circle"></i> Validate Against Category';
+            }
+        }
+
+        function displayClassificationResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            const confidence = result.confidence;
+            
+            let confidenceClass = 'low';
+            if (confidence >= 70) confidenceClass = 'high';
+            else if (confidence >= 50) confidenceClass = 'medium';
+            
+            let probabilitiesHtml = '';
+            if (result.probabilities) {
+                const sortedProbs = Object.entries(result.probabilities).sort((a, b) => b[1] - a[1]);
+                probabilitiesHtml = '<div style="margin-top: 1rem;"><strong>All Probabilities:</strong></div>';
+                for (const [cat, prob] of sortedProbs) {
+                    probabilitiesHtml += `
+                        <div class="probability-item">
+                            <div class="probability-label">
+                                <span>${cat}</span>
+                                <span>${prob}%</span>
+                            </div>
+                            <div class="probability-bar">
+                                <div class="probability-fill" style="width: ${prob}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultContent.innerHTML = `
+                <div class="result-status valid">
+                    <i class="fas fa-robot"></i>
+                    <strong>Classification Result</strong>
+                    <div style="margin-top: 12px;">
+                        <div style="font-size: 1.2rem; margin-bottom: 8px;">
+                            <span class="badge badge-success">Predicted: ${result.prediction}</span>
+                        </div>
+                        <div>Confidence: <strong>${confidence}%</strong></div>
+                        <div class="confidence-bar-container">
+                            <div class="confidence-bar ${confidenceClass}" style="width: ${confidence}%">${confidence}%</div>
+                        </div>
+                    </div>
+                    ${probabilitiesHtml}
+                </div>
+            `;
+        }
+
+        function displayValidationResult(result, category) {
+            const resultContent = document.getElementById('resultContent');
+            const isValid = result.isValid;
+            const confidence = result.confidence;
+            
+            const statusClass = isValid && confidence >= 50 ? 'valid' : 'invalid';
+            const statusText = isValid && confidence >= 50 ? 'PASSED' : 'FAILED';
+            
+            let confidenceClass = 'low';
+            if (confidence >= 70) confidenceClass = 'high';
+            else if (confidence >= 50) confidenceClass = 'medium';
+            
+            let probabilitiesHtml = '';
+            if (result.probabilities) {
+                const sortedProbs = Object.entries(result.probabilities).sort((a, b) => b[1] - a[1]);
+                probabilitiesHtml = '<div style="margin-top: 1rem;"><strong>All Probabilities:</strong></div>';
+                for (const [cat, prob] of sortedProbs) {
+                    probabilitiesHtml += `
+                        <div class="probability-item">
+                            <div class="probability-label">
+                                <span>${cat}</span>
+                                <span>${prob}%</span>
+                            </div>
+                            <div class="probability-bar">
+                                <div class="probability-fill" style="width: ${prob}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultContent.innerHTML = `
+                <div class="result-status ${statusClass}">
+                    <i class="fas ${isValid && confidence >= 50 ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                    <strong>Validation Result: ${statusText}</strong>
+                    <div style="margin-top: 12px;">
+                        <div>Expected Category: <strong>${category}</strong></div>
+                        <div>AI Detected: <strong>${result.predicted}</strong></div>
+                        <div>Confidence: <strong>${confidence}%</strong></div>
+                        <div class="confidence-bar-container">
+                            <div class="confidence-bar ${confidenceClass}" style="width: ${confidence}%">${confidence}%</div>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.9rem;">
+                            ${result.message}
+                        </div>
+                    </div>
+                    ${probabilitiesHtml}
+                    ${!isValid || confidence < 50 ? `
+                        <div style="margin-top: 12px; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                            <strong>⚠️ Recommendation:</strong> Please upload a clearer image of ${category} for better accuracy.
+                        </div>
+                    ` : `
+                        <div style="margin-top: 12px; padding: 8px; background: #d4edda; border-radius: 4px;">
+                            <strong>✅ Good to go!</strong> This image can be used for ${category} products.
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function clearAll() {
+            selectedFile = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('category').value = '';
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('classifyBtn').disabled = true;
+            document.getElementById('validateBtn').disabled = true;
+            
+            const uploadArea = document.getElementById('imageUploadArea');
+            uploadArea.style.borderColor = '#d1d5db';
+            uploadArea.style.background = '#f9fafb';
+        }
+
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.padding = '12px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.backgroundColor = type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d4edda';
+            toast.style.color = type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#155724';
+            toast.style.border = `1px solid ${type === 'error' ? '#f5c6cb' : type === 'warning' ? '#ffeaa7' : '#c3e6cb'}`;
+            toast.style.zIndex = '9999';
+            toast.style.fontSize = '0.875rem';
+            toast.style.fontFamily = 'sans-serif';
+            toast.innerHTML = notification;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

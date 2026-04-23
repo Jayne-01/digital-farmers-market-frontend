@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>My Profile - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="/farmer/Logo.png">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/customer/customer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Darker text for navigation */
+        .nav-link span, .nav-link i {
+            color: #111827 !important;
+        }
+        
+        .nav-link.active span, .nav-link.active i {
+            color: #16a34a !important;
+        }
+        
+        .user-toggle span#customer-name {
+            color: #111827 !important;
+            font-weight: 600;
+        }
+        
+        .user-toggle i {
+            color: #111827 !important;
+        }
+        
+        .avatar {
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+        }
+        
+        .dropdown-menu a {
+            color: #111827 !important;
+        }
+        
+        .dropdown-menu a.logout-btn {
+            color: #dc2626 !important;
+        }
+
+        /* Badge styles - white text */
+        .badge, .nav-link .badge, #cart-count, #orders-badge {
+            color: white !important;
+            background: #16a34a;
+        }
+
+        /* Logo styles */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo i.fa-seedling {
+            color: #16a34a !important;
+            font-size: 1.5rem;
+        }
+
+        .logo span {
+            color: #111827 !important;
+            font-weight: 600;
+        }
+
+        /* Profile dropdown styles */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .user-toggle:hover {
+            background: #f9fafb;
+        }
+
+        .user-toggle span#customer-name {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .user-toggle i {
+            color: #111827;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: auto;
+            width: 200px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e5e7eb;
+            color: #111827 !important;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f9fafb;
+        }
+
+        .dropdown-menu .logout-btn {
+            color: #dc2626 !important;
+        }
+
+        /* ========== PROFILE MAIN STYLES ========== */
+        .profile-main {
+            padding: 2rem 0;
+            background: #f9fafb;
+            min-height: calc(100vh - 80px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            margin-bottom: 2rem;
+        }
+
+        .profile-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .profile-header p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Profile Grid */
+        .profile-grid {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Profile Sidebar */
+        .profile-sidebar {
+            flex: 1;
+            min-width: 280px;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            height: fit-content;
+        }
+
+        /* Profile Avatar */
+        .profile-avatar-section {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+        }
+
+        .profile-avatar i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        .profile-avatar-section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .profile-avatar-section p {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        /* Profile Stats */
+        .profile-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 1.2rem;
+            color: #16a34a;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-info h4 {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .stat-info p {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+        /* Profile Content */
+        .profile-content {
+            flex: 3;
+            min-width: 300px;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-header h3 i {
+            color: #16a34a;
+        }
+
+        .btn-edit {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit:hover {
+            background: #15803d;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .info-item {
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .info-item.full-width {
+            grid-column: span 2;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #111827;
+            word-break: break-word;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-group label .required {
+            color: #dc2626;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #16a34a;
+            box-shadow: 0 0 0 2px rgba(22,163,74,0.1);
+        }
+
+        .field-note {
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .field-note i {
+            font-size: 0.65rem;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-cancel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .btn-cancel:hover {
+            background: #f9fafb;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .btn-save {
+            background: #16a34a;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-save:hover {
+            background: #15803d;
+        }
+
+       
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ========== RESPONSIVE STYLES ========== */
+        
+        /* Tablet and smaller desktop */
+        @media (max-width: 900px) {
+            .profile-grid {
+                flex-direction: column;
+            }
+            
+            .profile-sidebar {
+                position: static;
+                width: 100%;
+            }
+            
+            .profile-stats {
+                flex-direction: row;
+                gap: 1rem;
+            }
+            
+            .stat-item {
+                flex: 1;
+            }
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .profile-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .profile-sidebar,
+            .profile-content {
+                padding: 1rem;
+            }
+            
+            .profile-stats {
+                flex-direction: column;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-item.full-width {
+                grid-column: span 1;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .btn-edit {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn-cancel,
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Small mobile */
+        @media (max-width: 480px) {
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .profile-avatar i {
+                font-size: 2.5rem;
+            }
+            
+            .profile-avatar-section h2 {
+                font-size: 1rem;
+            }
+            
+            .stat-info p {
+                font-size: 1rem;
+            }
+            
+            .info-value {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Navigation responsiveness */
+        @media (max-width: 1000px) {
+            .nav-actions {
+                gap: 0.5rem;
+            }
+            
+            .nav-link span {
+                display: none;
+            }
+            
+            .nav-link {
+                padding: 0.5rem;
+                position: relative;
+            }
+            
+            .nav-link .badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+            }
+            
+            /* Dropdown right alignment on resize */
+            .user-dropdown {
+                position: relative;
+            }
+            
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 0 !important;
+                left: auto !important;
+                width: 180px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .dropdown-menu {
+                right: -10px !important;
+                width: 170px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-customer">
+        <div class="container">
+            <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="Logo.png" alt="Logo" style="height: 60px; width: auto; border-radius: 8px;">
+                <div>
+                    <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
+                </div>
+            </a>
+            
+            <div class="nav-actions">
+                <a href="/customer/marketplace.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    <span>Marketplace</span>
+                </a>
+                <a href="/customer/cart.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Cart</span>
+                    <span class="badge" id="cart-count">0</span>
+                </a>
+                <a href="/customer/orders.html" class="nav-link">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Orders</span>
+                    <span class="badge" id="orders-badge" style="display: none;">0</span>
+                </a>
+                <a href="/customer/profile.html" class="nav-link active">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+
+                <!-- Profile Dropdown -->
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userToggle">
+                        <div class="avatar">
+                            <span id="customer-initial"></span>
+                        </div>
+                        <span id="customer-name"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="/customer/profile.html">My Profile</a>
+                        <a href="#" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="profile-main">
+        <div class="container">
+            <div class="profile-header">
+                <div>
+                    <h1>My Profile</h1>
+                    <p>Manage your personal information and account settings</p>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <!-- Profile Sidebar -->
+                <div class="profile-sidebar">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2 id="displayName">Loading...</h2>
+                        <p id="displayEmail">Loading...</p>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Total Orders</h4>
+                                <p id="totalOrders">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>Member Since</h4>
+                                <p id="memberSince">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Content - View Mode -->
+                <div class="profile-content" id="viewMode">
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+                            <button class="btn-edit" id="editPersonalInfo">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Full Name</span>
+                                <span class="info-value" id="viewFullName">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email Address</span>
+                                <span class="info-value" id="viewEmail">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Phone Number</span>
+                                <span class="info-value" id="viewPhone">Not set</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Barangay</span>
+                                <span class="info-value" id="viewBarangay">Not set</span>
+                            </div>
+                            <div class="info-item full-width">
+                                <span class="info-label">Complete Address</span>
+                                <span class="info-value" id="viewAddress">Not set</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Content - Edit Mode (Hidden by default) -->
+                <div class="profile-content" id="editMode" style="display: none;">
+                    <form id="profileForm">
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3><i class="fas fa-user-circle"></i> Edit Personal Information</h3>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label for="editFullName">Full Name <span class="required">*</span></label>
+                                    <input type="text" id="editFullName" name="full_name" required placeholder="Enter your full name">
+                                    <div class="field-note">
+                                        <i class="fas fa-info-circle"></i> Your full name as it appears on your ID
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="editEmail">Email Address</label>
+                                    <input type="email" id="editEmail" name="email" value="" disabled 
+                                           style="background-color: #f9fafb; cursor: not-allowed; color: #4b5563; border-color: #e5e7eb;">
+                                    <div class="field-note">
+                                        <i class="fas fa-lock"></i> Email address cannot be changed
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="editPhone">Phone Number</label>
+                                    <input type="tel" id="editPhone" name="contact_number" placeholder="e.g., 09123456789">
+                                    <div class="field-note">
+                                        <i class="fas fa-phone"></i> For delivery updates
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="editBarangay">Barangay</label>
+                                    <input type="text" id="editBarangay" name="barangay" placeholder="e.g., Poblacion">
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label for="editAddress">Complete Address</label>
+                                    <textarea id="editAddress" name="address" rows="3" placeholder="Street, Building, House No."></textarea>
+                                    <div class="field-note">
+                                        <i class="fas fa-map-marker-alt"></i> Your delivery address
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" id="cancelEdit">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token) {
+                window.location.href = '/auth/login.html';
+                return;
+            }
+            
+            document.getElementById('customer-name').textContent = user.full_name || 'Customer';
+            document.getElementById('customer-initial').textContent = (user.full_name || 'C').charAt(0).toUpperCase();
+            
+            initDropdown();
+            loadProfileData();
+            setupEventListeners();
+            updateCartCount();
+            updateOrdersBadge();
+        });
+
+        function initDropdown() {
+            const userToggle = document.getElementById('userToggle');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            
+            if (userToggle && dropdownMenu) {
+                const newToggle = userToggle.cloneNode(true);
+                userToggle.parentNode.replaceChild(newToggle, userToggle);
+                
+                newToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    dropdownMenu.classList.toggle('show');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!newToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+
+                dropdownMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('editPersonalInfo').addEventListener('click', function() {
+                switchToEditMode();
+            });
+
+            document.getElementById('cancelEdit').addEventListener('click', function() {
+                switchToViewMode();
+            });
+
+            document.getElementById('profileForm').addEventListener('submit', saveProfileChanges);
+
+            document.querySelector('.logout-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+
+        async function loadProfileData() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load profile');
+                
+                const data = await response.json();
+                const user = data.user || data.data;
+                
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                updateProfileDisplay(user);
+                loadOrderStats();
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showNotification('Error loading profile data', 'error');
+                
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                updateProfileDisplay(user);
+            }
+        }
+
+        function updateProfileDisplay(user) {
+            document.getElementById('displayName').textContent = user.full_name || 'Customer';
+            document.getElementById('displayEmail').textContent = user.email || 'No email';
+            document.getElementById('customer-name').textContent = user.full_name || 'Customer';
+            document.getElementById('customer-initial').textContent = (user.full_name || 'C').charAt(0).toUpperCase();
+            
+            document.getElementById('viewFullName').textContent = user.full_name || 'Not set';
+            document.getElementById('viewEmail').textContent = user.email || 'Not set';
+            document.getElementById('viewPhone').textContent = user.contact_number || 'Not set';
+            document.getElementById('viewBarangay').textContent = user.barangay || 'Not set';
+            document.getElementById('viewAddress').textContent = user.address || 'Not set';
+            
+            document.getElementById('editFullName').value = user.full_name || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editPhone').value = user.contact_number || '';
+            document.getElementById('editBarangay').value = user.barangay || '';
+            document.getElementById('editAddress').value = user.address || '';
+            
+            if (user.created_at) {
+                const date = new Date(user.created_at);
+                document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } else {
+                document.getElementById('memberSince').textContent = 'N/A';
+            }
+        }
+
+        async function loadOrderStats() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/orders/my-purchases`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load orders');
+                
+                const data = await response.json();
+                const orders = data.orders || [];
+                
+                document.getElementById('totalOrders').textContent = orders.length;
+                
+            } catch (error) {
+                console.error('Error loading order stats:', error);
+                document.getElementById('totalOrders').textContent = '0';
+            }
+        }
+
+        function switchToEditMode() {
+            document.getElementById('viewMode').style.display = 'none';
+            document.getElementById('editMode').style.display = 'block';
+        }
+
+        function switchToViewMode() {
+            document.getElementById('viewMode').style.display = 'block';
+            document.getElementById('editMode').style.display = 'none';
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('editFullName').value = user.full_name || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editPhone').value = user.contact_number || '';
+            document.getElementById('editBarangay').value = user.barangay || '';
+            document.getElementById('editAddress').value = user.address || '';
+        }
+
+        async function saveProfileChanges(e) {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            
+            const formData = {
+                full_name: document.getElementById('editFullName').value,
+                contact_number: document.getElementById('editPhone').value,
+                barangay: document.getElementById('editBarangay').value,
+                address: document.getElementById('editAddress').value
+            };
+            
+            if (!formData.full_name) {
+                showNotification('Full name is required', 'error');
+                return;
+            }
+            
+            const saveBtn = document.querySelector('#profileForm button[type="submit"]');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/update-profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+                    const updatedUser = { 
+                        ...currentUser, 
+                        ...data.user,
+                        email: currentUser.email
+                    };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    
+                    showNotification('✅ Profile updated successfully!');
+                    
+                    updateProfileDisplay(updatedUser);
+                    switchToViewMode();
+                    
+                } else {
+                    showNotification('❌ ' + (data.error || 'Failed to update profile'), 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showNotification('❌ Error saving profile changes', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+        }
+
+        async function updateCartCount() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/cart/count`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const cartBadge = document.getElementById('cart-count');
+                    if (cartBadge) {
+                        const count = data.count || 0;
+                        cartBadge.textContent = count;
+                        cartBadge.style.display = count > 0 ? 'inline' : 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        async function updateOrdersBadge() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/orders/my-purchases`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const orders = data.orders || [];
+                    const activeOrders = orders.filter(order => {
+                        const status = (order.status || '').toLowerCase();
+                        return !['delivered', 'cancelled'].includes(status);
+                    }).length;
+                    
+                    const badge = document.getElementById('orders-badge');
+                    if (badge) {
+                        if (activeOrders > 0) {
+                            badge.textContent = activeOrders > 9 ? '9+' : activeOrders;
+                            badge.style.display = 'inline';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating orders badge:', error);
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

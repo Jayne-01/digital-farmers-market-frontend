@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create First Admin - Digital Farmers Market</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #4caf50;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4caf50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #2e7d32;
+            text-align: center;
+        }
+        
+        .existing-admin-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌾 Create First Admin</h1>
+        <div class="subtitle">Set up the administrator account for the Digital Farmers Market</div>
+        
+        <div id="existingWarning" class="existing-admin-warning">
+            ⚠️ An admin already exists! Please login instead.
+        </div>
+        
+        <form id="adminForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" required placeholder="Enter your full name" autocomplete="name">
+            </div>
+            
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" required placeholder="admin@example.com" autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required placeholder="At least 8 characters" autocomplete="new-password">
+            </div>
+            
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword" required placeholder="Re-enter password" autocomplete="new-password">
+            </div>
+            
+            <button type="submit" id="submitBtn">Create Admin Account</button>
+        </form>
+        
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            Creating admin account...
+        </div>
+        <div class="info-box">
+            ℹ️ This will create the first administrator account. After creation, you'll be automatically logged in.
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        
+        // Check if admin already exists on page load
+        async function checkIfAdminExists() {
+            try {
+                // Try to fetch analytics - if it works, admin exists and we have token
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (token) {
+                    const response = await fetch(`${API_BASE_URL}/api/admin/analytics`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        // Already logged in, redirect to dashboard
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                }
+                
+                // Try to see if any admin exists by attempting to create (will fail if exists)
+                // This is just a check - we don't actually create
+            } catch (error) {
+                // Ignore errors
+            }
+        }
+        
+        // Function to store auth data securely
+        function storeAuthData(token, adminData) {
+            // Store in multiple places for redundancy
+            localStorage.setItem('token', token);
+            localStorage.setItem('admin_token', token);
+            localStorage.setItem('user', JSON.stringify(adminData));
+            localStorage.setItem('admin_user', JSON.stringify(adminData));
+            
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('admin_token', token);
+            sessionStorage.setItem('user', JSON.stringify(adminData));
+            sessionStorage.setItem('admin_user', JSON.stringify(adminData));
+            
+            console.log('Auth data stored successfully');
+        }
+        
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Clear previous messages
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'none';
+            document.getElementById('existingWarning').style.display = 'none';
+            
+            // Validation
+            if (!fullName || !email || !password || !confirmPassword) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match!', 'error');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showMessage('Password must be at least 8 characters!', 'error');
+                return;
+            }
+            
+            if (!email.includes('@') || !email.includes('.')) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Disable button and show loading
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            document.getElementById('loading').classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/create-first-admin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        full_name: fullName,
+                        email: email,
+                        password: password,
+                        confirm_password: confirmPassword
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Store the token and user data
+                    if (data.token) {
+                        storeAuthData(data.token, data.admin);
+                        console.log('Token stored, redirecting to dashboard...');
+                        showMessage('✅ Admin created successfully! Redirecting to dashboard...', 'success');
+                        
+                        // Small delay to show success message
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                    } else {
+                        console.error('No token in response:', data);
+                        showMessage('Admin created but no token received. Please login manually.', 'error');
+                        submitBtn.disabled = false;
+                    }
+                } else if (response.status === 403 && data.error === 'Admin already exists. Please login instead.') {
+                    // Admin already exists - show warning and disable form
+                    document.getElementById('existingWarning').style.display = 'block';
+                    showMessage('Admin account already exists! Redirecting to login...', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showMessage(data.error || data.message || 'Failed to create admin account', 'error');
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                let errorMsg = 'Error connecting to server. ';
+                if (error.message === 'Failed to fetch') {
+                    errorMsg += 'Make sure the backend server is running on port 5000';
+                } else {
+                    errorMsg += error.message;
+                }
+                showMessage(errorMsg, 'error');
+                submitBtn.disabled = false;
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+            }
+        });
+        
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // Auto hide error messages after 5 seconds
+            if (type === 'error') {
+                setTimeout(() => {
+                    if (messageDiv.className.includes('error')) {
+                        messageDiv.style.display = 'none';
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Check if already logged in on page load
+        (function checkExistingSession() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (token) {
+                // Verify token is still valid
+                fetch(`${API_BASE_URL}/api/admin/analytics`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(response => {
+                    if (response.ok) {
+                        // Already logged in, redirect to dashboard
+                        console.log('Existing session found, redirecting to dashboard');
+                        window.location.href = 'dashboard.html';
+                    }
+                }).catch(() => {
+                    // Token invalid, clear it
+                    localStorage.clear();
+                    sessionStorage.clear();
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

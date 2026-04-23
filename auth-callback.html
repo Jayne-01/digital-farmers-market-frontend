@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completing Sign In - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="/Logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #16a34a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #16a34a;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        h2 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-email {
+            color: #16a34a;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <div class="success-icon" id="successIcon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="error-icon" id="errorIcon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <h2 id="message">Completing sign in...</h2>
+        <p id="submessage">Please wait while we redirect you</p>
+        <div id="userEmail" class="user-email"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const role = urlParams.get('role');
+        const name = decodeURIComponent(urlParams.get('name') || '');
+        const email = decodeURIComponent(urlParams.get('email') || '');
+        const isNewUser = urlParams.get('isNewUser') === 'true';
+        const error = urlParams.get('error');
+
+        if (error) {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('errorIcon').style.display = 'block';
+            document.getElementById('message').textContent = 'Sign In Failed';
+            document.getElementById('submessage').textContent = error;
+            
+            setTimeout(() => {
+                window.location.href = '/auth/login.html?error=' + encodeURIComponent(error);
+            }, 3000);
+        } 
+        else if (token) {
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify({
+                full_name: name,
+                email: email,
+                role: role
+            }));
+            
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('successIcon').style.display = 'block';
+            
+            if (isNewUser) {
+                document.getElementById('message').textContent = 'Welcome to Digital Farmers Market!';
+                document.getElementById('submessage').textContent = 'Your account has been created.';
+                document.getElementById('userEmail').textContent = email;
+            } else {
+                document.getElementById('message').textContent = `Welcome back, ${name.split(' ')[0]}!`;
+                document.getElementById('submessage').textContent = 'Redirecting to your dashboard...';
+                document.getElementById('userEmail').textContent = email;
+            }
+            
+            setTimeout(() => {
+                if (role === 'ADMIN') {
+                    window.location.href = '/admin/dashboard.html';
+                } else if (role === 'FARMER') {
+                    window.location.href = '/farmer/dashboard.html';
+                } else {
+                    window.location.href = '/customer/marketplace.html';
+                }
+            }, 2000);
+        } 
+        else {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('errorIcon').style.display = 'block';
+            document.getElementById('message').textContent = 'Authentication Error';
+            document.getElementById('submessage').textContent = 'No authentication token received';
+            
+            setTimeout(() => {
+                window.location.href = '/auth/login.html?error=no_token';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

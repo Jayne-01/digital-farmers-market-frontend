@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Maintenance - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="/Logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .maintenance-container {
+            text-align: center;
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .maintenance-icon {
+            width: 100px;
+            height: 100px;
+            background: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .maintenance-icon i {
+            font-size: 3rem;
+            color: #f59e0b;
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #f59e0b;
+            margin-right: 0.5rem;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        .contact {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+        }
+        .btn-home {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .btn-home:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        }
+        .btn-admin {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+        .btn-admin:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        @media (max-width: 640px) {
+            .maintenance-container { padding: 1.5rem; }
+            h1 { font-size: 1.3rem; }
+            .maintenance-icon { width: 70px; height: 70px; }
+            .maintenance-icon i { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-container">
+        <div class="maintenance-icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        <h1>We'll Be Back Soon!</h1>
+        <p>Our site is currently under scheduled maintenance.</p>
+        <p>We're working hard to improve your experience and will be back online shortly.</p>
+        <p><span class="status-dot"></span> Maintenance in progress</p>
+        <a href="/" class="btn-home">
+            <i class="fas fa-home"></i> Return to Homepage
+        </a>
+        <div class="contact">
+            <i class="fas fa-envelope"></i> Need help? Contact us at <strong>digitalfarmersmarket@gmail.com</strong>
+        </div>
+    </div>
+    
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        
+        // Auto-refresh to check if maintenance is over every 30 seconds
+        let checkInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/maintenance-status`);
+                const data = await response.json();
+                if (data.maintenance_mode === false) {
+                    clearInterval(checkInterval);
+                    // Redirect to home page
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.log('Maintenance check failed:', error);
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
