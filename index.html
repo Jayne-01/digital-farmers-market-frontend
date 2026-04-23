@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Farmers Market - Bulan, Sorsogon</title>
+    <link rel="icon" type="Logo.png" href="Logo.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Force header to stay in one line on desktop */
+        @media (min-width: 992px) {
+            .hero-content h1 {
+                white-space: nowrap;
+                font-size: 2.2rem; /* Adjust this value if needed */
+            }
+        }
+        
+        /* For larger screens, increase font size slightly */
+        @media (min-width: 1200px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+           <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+    <img src="farmer/Logo.png" alt="Logo" style="height: 100px; width: auto; border-radius: 8px;">
+    <div>
+        <span style="font-weight: 900; font-size: 2.0rem;">Digital Farmers Market</span>
+    </div>
+</a>
+            
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#about">About</a>
+                <a href="/auth/login.html" class="btn btn-outline">Login</a>
+                <a href="/auth/register.html" class="btn btn-primary">Sign Up</a>
+            </div>
+            
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Connecting Local Farmers to Customers in Bulan, Sorsogon</h1>
+                <p>A digital marketplace powered by AI to help farmers sell their products directly to customers, get market insights, and grow their business.</p>
+                <div class="hero-buttons">
+                    <a href="/auth/register.html?role=farmer" class="btn btn-primary btn-lg">
+                        <i class="fas fa-tractor"></i> I'm a Farmer
+                    </a>
+                    <a href="/auth/register.html?role=customer" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-shopping-basket"></i> I'm a Customer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section features">
+        <div class="container">
+            <h2 class="section-title">Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Market Insights</h3>
+                    <p>Get AI-powered recommendations on what crops to plant based on market demand.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3>Digital Storefront</h3>
+                    <p>Create your online store and showcase products with images and descriptions.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Recommendations</h3>
+                    <p>Hybrid algorithm that analyzes customer behavior to suggest products.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3>Direct Delivery</h3>
+                    <p>Connect directly with customers for delivery or pickup arrangements.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="section how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Register Your Account</h3>
+                    <p>Sign up as a farmer or customer with your details.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Farmers: List Products</h3>
+                    <p>Upload your products with images, prices, and descriptions.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Customers: Browse & Order</h3>
+                    <p>Browse fresh local products and place orders directly.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Get AI Insights</h3>
+                    <p>Farmers receive recommendations based on market trends.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="about" class="footer">
+        <div class="container">
+            <h2 class="section-title">About</h2>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Digital Farmers Market</h3>
+                    <p>Empowering local farmers in Bulan, Sorsogon through technology.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="/auth/login.html">Login</a>
+                    <a href="/auth/register.html">Register</a>
+                    <a href="#features">Features</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Bulan, Sorsogon</p>
+                    <p>digitalfarmersmarket@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Digital Farmers Market. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/api.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    
+                    // Change icon
+                    const icon = menuToggle.querySelector('i');
+                    if (navLinks.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+                
+                // Close menu when clicking a link
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', function() {
+                        navLinks.classList.remove('active');
+                        const icon = menuToggle.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    });
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!navLinks.contains(event.target) && !menuToggle.contains(event.target)) {
+                        navLinks.classList.remove('active');
+                        const icon = menuToggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

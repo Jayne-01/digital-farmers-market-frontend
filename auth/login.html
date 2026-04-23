@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="/Logo.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/auth/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.2s ease;
+        }
+        .toast.success { background: #2E7D32; }
+        .toast.error { background: #dc2626; }
+        .toast.info { background: #3b82f6; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .fade-out {
+            animation: fadeOut 0.2s ease forwards;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .btn-primary {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-primary.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        .btn-primary.loading i.fa-spinner {
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .form-group input {
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .form-group input.error-input {
+            border-color: #dc2626;
+            background-color: #fef2f2;
+        }
+        
+        .maintenance-badge {
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .maintenance-message {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            color: #92400e;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        body.redirecting {
+            opacity: 0.95;
+            transition: opacity 0.2s ease;
+        }
+        
+        @keyframes btn-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fa-spinner {
+            animation: btn-spin 0.7s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="auth-container" id="authContainer" style="display: none;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                    <img src="/farmer/Logo.png" alt="Logo" style="height: 80px; width: auto; border-radius: 8px;">
+                    <div>
+                        <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
+                    </div>
+                </a>
+                <h2>Welcome Back</h2>
+                <p>Login to access your account</p>
+            </div>
+            
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email" autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember" id="rememberCheckbox">
+                        <span>Remember me</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>Or continue with</span>
+            </div>
+            
+            <button type="button" id="googleSignInBtn" class="btn-google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 20px; height: 20px;">
+                Sign in with Google
+            </button>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/auth/register.html">Sign up here</a></p>
+                <a href="/" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== LOGIN FUNCTIONALITY ====================
+        const BACKEND_URL = 'http://localhost:5000';
+        
+        // DOM Elements
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const authContainer = document.getElementById('authContainer');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const rememberCheckbox = document.getElementById('rememberCheckbox');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const googleBtn = document.getElementById('googleSignInBtn');
+        
+        let toastTimer = null;
+        let currentToast = null;
+        
+        function showToast(message, type = 'success', duration = 3000) {
+            if (currentToast && currentToast.remove) currentToast.remove();
+            if (toastTimer) clearTimeout(toastTimer);
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            document.body.appendChild(toast);
+            currentToast = toast;
+            
+            toastTimer = setTimeout(() => {
+                if (toast) {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => toast.remove(), 200);
+                }
+                toastTimer = null;
+            }, duration);
+        }
+        
+        function clearInputErrors() {
+            if (emailInput) emailInput.classList.remove('error-input');
+            if (passwordInput) passwordInput.classList.remove('error-input');
+        }
+        
+        function showInputError(input, isError = true) {
+            if (!input) return;
+            if (isError) {
+                input.classList.add('error-input');
+            } else {
+                input.classList.remove('error-input');
+            }
+        }
+        
+        function setButtonLoading(button, isLoading, customText = null) {
+            if (!button) return;
+            
+            if (isLoading) {
+                if (!button.getAttribute('data-original-content')) {
+                    button.setAttribute('data-original-content', button.innerHTML);
+                }
+                button.classList.add('loading');
+                button.disabled = true;
+                button.innerHTML = customText || '<i class="fas fa-spinner"></i> Logging in...';
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                const original = button.getAttribute('data-original-content');
+                if (original) {
+                    button.innerHTML = original;
+                }
+            }
+        }
+        
+        function resetLoginButton() {
+            if (loginBtn) {
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+                const original = loginBtn.getAttribute('data-original-content');
+                if (original) {
+                    loginBtn.innerHTML = original;
+                } else {
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                }
+            }
+        }
+        
+        function validateForm() {
+            clearInputErrors();
+            
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passwordInput ? passwordInput.value : '';
+            
+            let isValid = true;
+            
+            if (!email) {
+                showInputError(emailInput, true);
+                showToast('Please enter your email address', 'error');
+                emailInput?.focus();
+                isValid = false;
+            } else if (!email.includes('@') || !email.includes('.')) {
+                showInputError(emailInput, true);
+                showToast('Please enter a valid email address', 'error');
+                emailInput?.focus();
+                isValid = false;
+            } else if (!password) {
+                showInputError(passwordInput, true);
+                showToast('Please enter your password', 'error');
+                passwordInput?.focus();
+                isValid = false;
+            }
+            
+            return isValid ? { email, password, isValid: true } : { isValid: false };
+        }
+        
+        // Check if maintenance mode is ON before trying to login
+        async function checkMaintenanceMode() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/maintenance-status`);
+                const data = await response.json();
+                return data.maintenance_mode === true;
+            } catch (error) {
+                console.log('Maintenance check failed:', error);
+                return false;
+            }
+        }
+        
+        // Try admin login first, then customer login
+        async function tryAdminLogin(email, password) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/admin/login`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    return { success: true, data: data, isAdmin: true };
+                }
+                return { success: false };
+            } catch (error) {
+                return { success: false };
+            }
+        }
+        
+        async function tryCustomerLogin(email, password) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                // Check if maintenance mode is blocking the login
+                if (response.status === 503 && data.maintenance === true) {
+                    return { success: false, maintenance: true, message: data.message };
+                }
+                
+                if (response.ok && data.token) {
+                    return { success: true, data: data, isAdmin: false };
+                }
+                return { success: false, maintenance: false };
+            } catch (error) {
+                return { success: false, maintenance: false };
+            }
+        }
+        
+        async function handleLogin(email, password, remember) {
+            // First check if maintenance mode is ON (for non-admin users)
+            const isMaintenanceOn = await checkMaintenanceMode();
+            
+            // First try admin login (admin can login even during maintenance)
+            let loginResult = await tryAdminLogin(email, password);
+            
+            if (loginResult.success) {
+                // Admin login successful
+                const data = loginResult.data;
+                
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.admin || data.user));
+                
+                if (remember) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+                
+                showToast('Login successful! Redirecting...', 'success', 1000);
+                
+                setTimeout(() => {
+                    window.location.href = '/admin/dashboard.html';
+                }, 800);
+                
+                return { success: true };
+            }
+            
+            // If maintenance is ON and not admin, redirect to maintenance page
+            if (isMaintenanceOn) {
+                showToast('System is under maintenance. Please try again later.', 'error', 3000);
+                setTimeout(() => {
+                    window.location.href = '/maintenance.html';
+                }, 2500);
+                return { success: false, maintenance: true };
+            }
+            
+            // Try customer login
+            loginResult = await tryCustomerLogin(email, password);
+            
+            if (loginResult.success) {
+                const data = loginResult.data;
+                
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                if (remember) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+                
+                showToast('Login successful! Redirecting...', 'success', 1000);
+                
+                const role = data.user.role;
+                let redirectUrl = '/customer/marketplace.html';
+                if (role === 'FARMER') redirectUrl = '/farmer/dashboard.html';
+                
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 800);
+                
+                return { success: true };
+            } else if (loginResult.maintenance) {
+                // Maintenance mode blocking customer login
+                showToast(loginResult.message || 'System is under maintenance. Please try again later.', 'error', 3000);
+                setTimeout(() => {
+                    window.location.href = '/maintenance.html';
+                }, 2500);
+                return { success: false, maintenance: true };
+            } else {
+                throw new Error('Invalid email or password');
+            }
+        }
+        
+        // Event Handlers
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                clearInputErrors();
+                
+                const validation = validateForm();
+                if (!validation.isValid) return;
+                
+                const { email, password } = validation;
+                const remember = rememberCheckbox ? rememberCheckbox.checked : false;
+                
+                setButtonLoading(loginBtn, true);
+                
+                try {
+                    await handleLogin(email, password, remember);
+                } catch (error) {
+                    console.error('Login error:', error);
+                    
+                    let errorMessage = 'Login failed. Please try again.';
+                    if (error.message.includes('timeout')) {
+                        errorMessage = 'Connection timeout. Please check your network.';
+                    } else if (error.message.includes('password') || error.message.includes('email')) {
+                        errorMessage = error.message;
+                        if (error.message.toLowerCase().includes('password') || 
+                            error.message.toLowerCase().includes('invalid')) {
+                            showInputError(passwordInput, true);
+                        }
+                    }
+                    
+                    showToast(errorMessage, 'error');
+                    resetLoginButton();
+                }
+            });
+        }
+        
+        if (emailInput) {
+            emailInput.addEventListener('focus', () => {
+                emailInput.classList.remove('error-input');
+            });
+            emailInput.addEventListener('input', () => {
+                emailInput.classList.remove('error-input');
+            });
+        }
+        
+        if (passwordInput) {
+            passwordInput.addEventListener('focus', () => {
+                passwordInput.classList.remove('error-input');
+            });
+            passwordInput.addEventListener('input', () => {
+                passwordInput.classList.remove('error-input');
+            });
+        }
+        
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async () => {
+                // Check maintenance mode first
+                const isMaintenanceOn = await checkMaintenanceMode();
+                if (isMaintenanceOn) {
+                    showToast('Google login is disabled during maintenance', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/maintenance.html';
+                    }, 2000);
+                    return;
+                }
+                
+                if (rememberCheckbox && rememberCheckbox.checked && emailInput && emailInput.value.trim()) {
+                    localStorage.setItem('remembered_email', emailInput.value.trim());
+                }
+                
+                const originalGoogleContent = googleBtn.innerHTML;
+                googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+                googleBtn.disabled = true;
+                
+                window.location.href = `${BACKEND_URL}/api/auth/google`;
+                
+                setTimeout(() => {
+                    if (googleBtn && googleBtn.disabled) {
+                        googleBtn.innerHTML = originalGoogleContent;
+                        googleBtn.disabled = false;
+                    }
+                }, 3000);
+            });
+        }
+        
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                const prefetchUrls = ['/admin/dashboard.html', '/farmer/dashboard.html', '/customer/marketplace.html'];
+                prefetchUrls.forEach(url => {
+                    const link = document.createElement('link');
+                    link.rel = 'prefetch';
+                    link.href = url;
+                    link.as = 'document';
+                    document.head.appendChild(link);
+                });
+            });
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (loginForm && loginBtn && !loginBtn.disabled) {
+                    loginForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                }
+            }
+        });
+        
+        window.addEventListener('beforeunload', () => {
+            if (toastTimer) clearTimeout(toastTimer);
+        });
+        
+        // Initialize page - Show UI
+        (async function init() {
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+            if (authContainer) authContainer.style.display = 'block';
+            
+            try {
+                const rememberedEmail = localStorage.getItem('remembered_email');
+                if (rememberedEmail && emailInput) {
+                    emailInput.value = rememberedEmail;
+                    if (rememberCheckbox) rememberCheckbox.checked = true;
+                }
+            } catch (e) { }
+            
+            if (performance && performance.timing) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`✅ Login page loaded in ${loadTime}ms`);
+            }
+        })();
+    </script>
+</body>
+</html>

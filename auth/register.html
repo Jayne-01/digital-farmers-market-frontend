@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="/Logo.png">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/auth/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+    <img src="../farmer/Logo.png" alt="Logo" style="height: 80px; width: auto; border-radius: 8px;">
+    <div>
+        <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
+    </div>
+</a>
+                <h2>Create Account</h2>
+                <p>Join as a customer</p>
+            </div>
+            
+            <form id="registerForm" class="auth-form">
+                <input type="hidden" name="role" value="CUSTOMER">
+                
+                <!-- Full Name Section -->
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    
+                    <!-- First Row: First Name + Middle Name -->
+                    <div class="name-row">
+                        <div class="first-name">
+                            <input type="text" name="first_name" placeholder="First Name" required>
+                        </div>
+                        <div class="middle-name">
+                            <input type="text" name="middle_name" placeholder="Middle Name">
+                        </div>
+                    </div>
+                    
+                    <!-- Second Row: Middle Initial + Last Name -->
+                    <div class="name-row">
+                        <div class="middle-initial">
+                            <input type="text" name="middle_initial" placeholder="MI" maxlength="2" style="text-transform: uppercase;">
+                        </div>
+                        <div class="last-name">
+                            <input type="text" name="last_name" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Suffix Row -->
+                    <div class="suffix-row">
+                        <select name="suffix">
+                            <option value="">Suffix</option>
+                            <option value="Jr.">Jr.</option>
+                            <option value="Sr.">Sr.</option>
+                            <option value="II">II</option>
+                            <option value="III">III</option>
+                            <option value="IV">IV</option>
+                            <option value="V">V</option>
+                        </select>
+                        <small class="form-text"><i class="fas fa-info-circle"></i> Enter your complete name</small>
+                    </div>
+                </div>
+                
+                <!-- Email -->
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="email" required placeholder="admin@gmail.com">
+                </div>
+                
+                <!-- Password -->
+                <div class="form-group">
+                    <label>Password *</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password" required placeholder="Enter password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
+                            <i class="far fa-eye" id="password-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label>Confirm Password *</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="confirm_password" id="confirm_password" required placeholder="Re-enter password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm_password')">
+                            <i class="far fa-eye" id="confirm_password-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Contact Number -->
+                <div class="form-group">
+                    <label>Contact Number *</label>
+                    <input type="tel" name="contact_number" required placeholder="09123456789">
+                </div>
+                
+                <!-- Barangay Selection -->
+                <div class="form-group">
+                    <label>Barangay *</label>
+                    <select name="barangay" id="barangaySelect" required>
+                        <option value="">Select Barangay</option>
+                        <option value="A. Bonifacio (Tinurilan)">A. Bonifacio (Tinurilan)</option>
+                        <option value="Abad Santos (Kambal)">Abad Santos (Kambal)</option>
+                        <option value="Aguinaldo (Lipata Dako)">Aguinaldo (Lipata Dako)</option>
+                        <option value="Antipolo">Antipolo</option>
+                        <option value="Aquino (Imelda)">Aquino (Imelda)</option>
+                        <option value="Beguin">Beguin</option>
+                        <option value="Bical">Bical</option>
+                        <option value="Bonga">Bonga</option>
+                        <option value="Butag">Butag</option>
+                        <option value="Cadandanan">Cadandanan</option>
+                        <option value="Calomagon">Calomagon</option>
+                        <option value="Calpi">Calpi</option>
+                        <option value="Cocok-Cabitan">Cocok-Cabitan</option>
+                        <option value="Daganas">Daganas</option>
+                        <option value="Danao">Danao</option>
+                        <option value="Dolos">Dolos</option>
+                        <option value="E. Quirino (Pinangomhan)">E. Quirino (Pinangomhan)</option>
+                        <option value="Fabrica">Fabrica</option>
+                        <option value="G. Del Pilar (Tanga)">G. Del Pilar (Tanga)</option>
+                        <option value="Gate">Gate</option>
+                        <option value="Inararan">Inararan</option>
+                        <option value="J. Gerona (Biton)">J. Gerona (Biton)</option>
+                        <option value="J.P. Laurel (Pon-od)">J.P. Laurel (Pon-od)</option>
+                        <option value="Jamorawon">Jamorawon</option>
+                        <option value="Lajong">Lajong</option>
+                        <option value="Libertad (Calle Putol)">Libertad (Calle Putol)</option>
+                        <option value="Magsaysay (Bongog)">Magsaysay (Bongog)</option>
+                        <option value="Managa-naga">Managa-naga</option>
+                        <option value="Marinab">Marinab</option>
+                        <option value="Montecalvario">Montecalvario</option>
+                        <option value="N. Roque (Calayugan)">N. Roque (Calayugan)</option>
+                        <option value="Namo">Namo</option>
+                        <option value="Nasuje">Nasuje</option>
+                        <option value="Obrero">Obrero</option>
+                        <option value="Osmeña (Lipata Saday)">Osmeña (Lipata Saday)</option>
+                        <option value="Otavi">Otavi</option>
+                        <option value="Padre Diaz">Padre Diaz</option>
+                        <option value="Palale">Palale</option>
+                        <option value="Quezon (Cabarawan)">Quezon (Cabarawan)</option>
+                        <option value="R. Gerona (Butag)">R. Gerona (Butag)</option>
+                        <option value="Recto">Recto</option>
+                        <option value="Roxas (Busay)">Roxas (Busay)</option>
+                        <option value="Sagrada">Sagrada</option>
+                        <option value="San Francisco (Polot)">San Francisco (Polot)</option>
+                        <option value="San Isidro (Cabugaan)">San Isidro (Cabugaan)</option>
+                        <option value="San Juan Bag-o">San Juan Bag-o</option>
+                        <option value="San Juan Daan">San Juan Daan</option>
+                        <option value="San Rafael (Togbongon)">San Rafael (Togbongon)</option>
+                        <option value="San Ramon">San Ramon</option>
+                        <option value="San Vicente">San Vicente</option>
+                        <option value="Santa Remedios">Santa Remedios</option>
+                        <option value="Santa Teresita (Trece)">Santa Teresita (Trece)</option>
+                        <option value="Sigad">Sigad</option>
+                        <option value="Somagongsong">Somagongsong</option>
+                        <option value="Tarhan">Tarhan</option>
+                        <option value="Taromata">Taromata</option>
+                        <option value="Zone 1 (Ilawod)">Zone 1 (Ilawod)</option>
+                        <option value="Zone 2 (Sabang)">Zone 2 (Sabang)</option>
+                        <option value="Zone 3 (Central)">Zone 3 (Central)</option>
+                        <option value="Zone 4 (Central Business District)">Zone 4 (Central Business District)</option>
+                        <option value="Zone 5 (Canipaan)">Zone 5 (Canipaan)</option>
+                        <option value="Zone 6 (Baybay)">Zone 6 (Baybay)</option>
+                        <option value="Zone 7 (Iraya)">Zone 7 (Iraya)</option>
+                        <option value="Zone 8 (Loyo)">Zone 8 (Loyo)</option>
+                    </select>
+                </div>
+
+                <!-- Street/Purok -->
+                <div class="form-group">
+                    <label>Street/Purok *</label>
+                    <input type="text" id="streetPurok" name="street_purok" placeholder="Enter your street or purok" required>
+                </div>
+
+                <!-- Complete Address -->
+                <div class="form-group">
+                    <label>Complete Address</label>
+                    <textarea name="address" id="completeAddress" rows="2" required readonly placeholder="Complete address will appear here" style="background-color: #f9fafb;"></textarea>
+                    <small class="form-text">Address is automatically generated from your selections</small>
+                </div>
+                
+                <!-- Terms Checkbox -->
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" name="terms" required>
+                        <span>I agree to the <span class="terms-link" onclick="showTermsModal()">Terms of Service and Privacy Policy</span></span>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="/auth/login.html">Login</a></p>
+                <a href="/" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-file-contract"></i>
+                <h3>Terms & Policy Notice</h3>
+            </div>
+            <div class="modal-body">
+                <p>By using this application, you agree to follow our terms and conditions. Your personal information will be collected and used only for service purposes and will be kept secure. Continued use of the system means you accept these policies.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="close-modal" onclick="hideTermsModal()">I Understand</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal functions
+        function showTermsModal() {
+            document.getElementById('termsModal').classList.add('show');
+        }
+        
+        function hideTermsModal() {
+            document.getElementById('termsModal').classList.remove('show');
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('termsModal');
+            if (event.target === modal) {
+                hideTermsModal();
+            }
+        }
+
+        // Password visibility toggle
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + '-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Address auto-generation
+        const barangaySelect = document.getElementById('barangaySelect');
+        const streetPurok = document.getElementById('streetPurok');
+        const completeAddress = document.getElementById('completeAddress');
+        
+        function updateAddress() {
+            const barangay = barangaySelect.value;
+            const street = streetPurok ? streetPurok.value.trim() : '';
+            
+            if (barangay) {
+                let address = '';
+                if (street) {
+                    address = `${street}, ${barangay}, Bulan, Sorsogon`;
+                } else {
+                    address = `${barangay}, Bulan, Sorsogon`;
+                }
+                completeAddress.value = address;
+            } else {
+                completeAddress.value = '';
+            }
+        }
+        
+        if (barangaySelect) {
+            barangaySelect.addEventListener('change', updateAddress);
+        }
+        
+        if (streetPurok) {
+            streetPurok.addEventListener('input', updateAddress);
+        }
+        
+        // Form submission - UPDATED to only send what backend expects
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password !== confirmPassword) {
+                alert('❌ Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('❌ Password must be at least 6 characters!');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            // Get name components
+            const firstName = formData.get('first_name') || '';
+            const middleName = formData.get('middle_name') || '';
+            const middleInitial = formData.get('middle_initial') || '';
+            const lastName = formData.get('last_name') || '';
+            const suffix = formData.get('suffix') || '';
+            
+            // Build the full name properly (for backend)
+            let fullName = firstName;
+            
+            // Handle middle name/initial
+            if (middleName && middleInitial) {
+                fullName += ` ${middleName} (${middleInitial})`;
+            } else if (middleName) {
+                fullName += ` ${middleName}`;
+            } else if (middleInitial) {
+                fullName += ` ${middleInitial}.`;
+            }
+            
+            fullName += ` ${lastName}`;
+            
+            if (suffix) {
+                fullName += `, ${suffix}`;
+            }
+            
+            // Create data object - ONLY sending what backend expects
+            const data = {
+                full_name: fullName,                    // Backend expects this
+                email: formData.get('email'),
+                password: password.trim(),
+                confirm_password: password.trim(),      // Backend expects this
+                contact_number: formData.get('contact_number'),
+                barangay: formData.get('barangay'),
+                address: formData.get('address')
+                // NOT sending: first_name, middle_name, middle_initial, last_name, suffix, terms, street_purok, role
+            };
+            
+            console.log('Sending to backend:', data);   // Verify full_name is included
+            
+            // Validate required fields
+            if (!fullName || !data.email || !data.contact_number || !data.barangay || !data.address) {
+                alert('❌ Please fill in all required fields');
+                return;
+            }
+            
+            // Check terms checkbox
+            if (!document.querySelector('input[name="terms"]').checked) {
+                alert('❌ Please agree to the Terms of Service');
+                return;
+            }
+            
+            // Show loading
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                console.log('Backend response:', result);
+                
+                if (res.ok && result.success) {
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    alert('✅ Registration successful!');
+                    window.location.href = '/customer/marketplace.html';
+                } else {
+                    throw new Error(result.error || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('❌ Registration failed: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

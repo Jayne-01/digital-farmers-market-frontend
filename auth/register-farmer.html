@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Seller - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="/Logo.png">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/customer/customer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background-color: #e6f7e6;">
+    <div class="container" style="max-width: 600px; margin: 50px auto;">
+        <div style="background: white; border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow-hover);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-store-alt" style="font-size: 3rem; color: var(--primary);"></i>
+                <h1 style="margin: 1rem 0 0.5rem;">Become a Seller</h1>
+                <p style="color: var(--text-light);">Start selling your fresh products to the community</p>
+            </div>
+            
+            <form id="farmer-registration-form">
+                <div class="form-group">
+                    <label>Farm Name</label>
+                    <input type="text" name="farm_name" required placeholder="e.g., Green Valley Farm">
+                </div>
+                
+                <div class="form-group">
+                    <label>Barangay</label>
+                    <select name="barangay" required>
+                        <option value="A. Bonifacio (Tinurilan)">A. Bonifacio (Tinurilan)</option>
+                        <option value="Abad Santos (Kambal)">Abad Santos (Kambal)</option>
+                        <option value="Aguinaldo (Lipata Dako)">Aguinaldo (Lipata Dako)</option>
+                        <option value="Antipolo">Antipolo</option>
+                        <option value="Aquino (Imelda)">Aquino (Imelda)</option>
+                        <option value="Beguin">Beguin</option>
+                        <option value="Bical">Bical</option>
+                        <option value="Bonga">Bonga</option>
+                        <option value="Butag">Butag</option>
+                        <option value="Cadandanan">Cadandanan</option>
+                        <option value="Calomagon">Calomagon</option>
+                        <option value="Calpi">Calpi</option>
+                        <option value="Cocok-Cabitan">Cocok-Cabitan</option>
+                        <option value="Daganas">Daganas</option>
+                        <option value="Danao">Danao</option>
+                        <option value="Dolos">Dolos</option>
+                        <option value="E. Quirino (Pinangomhan)">E. Quirino (Pinangomhan)</option>
+                        <option value="Fabrica">Fabrica</option>
+                        <option value="G. Del Pilar (Tanga)">G. Del Pilar (Tanga)</option>
+                        <option value="Gate">Gate</option>
+                        <option value="Inararan">Inararan</option>
+                        <option value="J. Gerona (Biton)">J. Gerona (Biton)</option>
+                        <option value="J.P. Laurel (Pon-od)">J.P. Laurel (Pon-od)</option>
+                        <option value="Jamorawon">Jamorawon</option>
+                        <option value="Lajong">Lajong</option>
+                        <option value="Libertad (Calle Putol)">Libertad (Calle Putol)</option>
+                        <option value="Magsaysay (Bongog)">Magsaysay (Bongog)</option>
+                        <option value="Managa-naga">Managa-naga</option>
+                        <option value="Marinab">Marinab</option>
+                        <option value="Montecalvario">Montecalvario</option>
+                        <option value="N. Roque (Calayugan)">N. Roque (Calayugan)</option>
+                        <option value="Namo">Namo</option>
+                        <option value="Nasuje">Nasuje</option>
+                        <option value="Obrero">Obrero</option>
+                        <option value="Osmeña (Lipata Saday)">Osmeña (Lipata Saday)</option>
+                        <option value="Otavi">Otavi</option>
+                        <option value="Padre Diaz">Padre Diaz</option>
+                        <option value="Palale">Palale</option>
+                        <option value="Quezon (Cabarawan)">Quezon (Cabarawan)</option>
+                        <option value="R. Gerona (Butag)">R. Gerona (Butag)</option>
+                        <option value="Recto">Recto</option>
+                        <option value="Roxas (Busay)">Roxas (Busay)</option>
+                        <option value="Sagrada">Sagrada</option>
+                        <option value="San Francisco (Polot)">San Francisco (Polot)</option>
+                        <option value="San Isidro (Cabugaan)">San Isidro (Cabugaan)</option>
+                        <option value="San Juan Bag-o">San Juan Bag-o</option>
+                        <option value="San Juan Daan">San Juan Daan</option>
+                        <option value="San Rafael (Togbongon)">San Rafael (Togbongon)</option>
+                        <option value="San Ramon">San Ramon</option>
+                        <option value="San Vicente">San Vicente</option>
+                        <option value="Santa Remedios">Santa Remedios</option>
+                        <option value="Santa Teresita (Trece)">Santa Teresita (Trece)</option>
+                        <option value="Sigad">Sigad</option>
+                        <option value="Somagongsong">Somagongsong</option>
+                        <option value="Tarhan">Tarhan</option>
+                        <option value="Taromata">Taromata</option>
+                        <option value="Zone 1 (Ilawod)">Zone 1 (Ilawod)</option>
+                        <option value="Zone 2 (Sabang)">Zone 2 (Sabang)</option>
+                        <option value="Zone 3 (Central)">Zone 3 (Central)</option>
+                        <option value="Zone 4 (Central Business District)">Zone 4 (Central Business District)</option>
+                        <option value="Zone 5 (Canipaan)">Zone 5 (Canipaan)</option>
+                        <option value="Zone 6 (Baybay)">Zone 6 (Baybay)</option>
+                        <option value="Zone 7 (Iraya)">Zone 7 (Iraya)</option>
+                        <option value="Zone 8 (Loyo)">Zone 8 (Loyo)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Farm Description</label>
+                    <textarea name="farm_description" rows="3" placeholder="Tell us about your farm..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="window.location.href='/customer/marketplace.html'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Register as Seller
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('farmer-registration-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:5000/api/auth/register-farmer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Successfully registered as a seller!');
+                    window.location.href = '/farmer/dashboard.html';
+                } else {
+                    alert('❌ ' + (result.error || 'Registration failed'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Failed to register');
+            }
+        });
+    </script>
+</body>
+</html>

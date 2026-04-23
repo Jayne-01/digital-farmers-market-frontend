@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Farm Profile - Farmer Dashboard</title>
+    <link rel="icon" type="image/png" href="Logo.png">
+    <!-- External Stylesheets (preserved) -->
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/farmer/farmer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ---------- GLOBAL RESET & BASE ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ---------- NAVBAR (COMPACT, CLEAN, DARK TEXT) ---------- */
+        .navbar-farmer {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e9eef3;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-farmer .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 48px;
+            width: auto;
+            border-radius: 10px;
+        }
+
+        .logo span {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #000000; /* pure black */
+            letter-spacing: -0.2px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Nav links - DARKENED to BLACK (#000000) */
+        .nav-link {
+            color: #000000 !important; /* Force black text */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-link i {
+            font-size: 0.95rem;
+            color: #000000 !important; /* black icons */
+        }
+
+        .nav-link:hover {
+            background: #eef2ff;
+            color: #22c55e !important;
+        }
+        .nav-link:hover i {
+            color: #22c55e !important;
+        }
+
+        .nav-link.active {
+            background: #e8f5e9;
+            color: #22c55e !important;
+            font-weight: 600;
+        }
+        .nav-link.active i {
+            color: #22c55e !important;
+        }
+
+        /* ORDER BADGE: RED BACKGROUND + WHITE NUMBER (fully opaque) */
+        .order-badge {
+            background: #ef4444 !important; /* solid red background */
+            color: white !important;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            margin-left: 0.2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            box-shadow: none;
+            line-height: 1;
+        }
+        /* override any pending class or dynamic class */
+        .order-badge.has-orders {
+            background: #ef4444 !important;
+            color: white !important;
+        }
+
+        /* user dropdown - farmer name black */
+        .user-dropdown {
+            position: relative;
+        }
+        .user-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: transparent;
+            border: none;
+            padding: 0.4rem 0.6rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-toggle:hover {
+            background: #f1f5f9;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .avatar i {
+            font-size: 1rem;
+            color: white;
+        }
+        /* Farmer name text: pure black and bold enough */
+        #farmer-name {
+            font-weight: 600;
+            color: #000000 !important;
+            font-size: 0.9rem;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 220px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            border: 1px solid #eef2f6;
+            margin-top: 0.5rem;
+            display: none;
+            z-index: 200;
+        }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .dropdown-menu a i { width: 1.25rem; color: #000000; }
+        .dropdown-menu a:hover { background: #f0fdf4; color: #22c55e; }
+        .dropdown-menu a:hover i { color: #22c55e; }
+        .dropdown-divider { height: 1px; background: #edf2f7; margin: 0.4rem 0; }
+
+        /* ---------- MAIN PROFILE LAYOUT (COMPACT) ---------- */
+        .profile-main {
+            padding: 2rem 0 3rem;
+        }
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 20px;
+            padding: 1.25rem 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid #eef2f6;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .profile-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .profile-header h1 i {
+            color: #22c55e;
+            margin-right: 0.5rem;
+        }
+        .profile-header p {
+            color: #334155;
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        /* Profile cards grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #eef2f6;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .profile-card.stats-card {
+            grid-column: span 2;
+        }
+        .profile-card-header {
+            padding: 1rem 1.5rem;
+            background: #fefefe;
+            border-bottom: 1px solid #f0f3f9;
+        }
+        .profile-card-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #000000;
+        }
+        .profile-card-header h3 i {
+            color: #22c55e;
+            font-size: 1rem;
+        }
+        .profile-card-body {
+            padding: 1.2rem 1.5rem;
+        }
+
+        /* Info rows - cleaner */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+            letter-spacing: -0.2px;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #000000;
+            font-size: 0.9rem;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+
+        /* verification badge - compact and elegant */
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            line-height: 1.2;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+        .verification-badge i {
+            font-size: 0.7rem;
+        }
+        .verification-badge.verified {
+            background: #e6f7ec;
+            color: #15803d;
+        }
+        .verification-badge.verified i {
+            color: #15803d;
+        }
+        .verification-badge.pending {
+            background: #fffbeb;
+            color: #b45309;
+        }
+        .verification-badge.pending i {
+            color: #e67e22;
+        }
+
+        /* Stats mini grid - compact */
+        .stats-grid-mini {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .stat-mini-item {
+            text-align: center;
+            background: #fafcff;
+            padding: 0.9rem 0.5rem;
+            border-radius: 18px;
+            border: 1px solid #eef2f8;
+        }
+        .stat-mini-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #334155;
+            margin-bottom: 0.4rem;
+        }
+        .stat-mini-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #22c55e;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #22c55e;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { background: #16a34a; }
+        .btn-outline {
+            background: white;
+            border: 1px solid #dce3ec;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #000000;
+        }
+        .btn-outline:hover { background: #f8fafc; border-color: #22c55e; color: #22c55e; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top:0;left:0;width:100%;height:100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: white;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .modal-content {
+            padding: 1.8rem 2rem;
+        }
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.2rem 0 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #000000;
+            border-left: 3px solid #22c55e;
+            padding-left: 0.7rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #000000;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #22c55e;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin-top: 1.8rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 0.7rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 4px solid #22c55e;
+        }
+        .toast.error { border-left-color: #ef4444; background: #2d2a2e; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast { animation: slideIn 0.25s ease; }
+        @media (max-width: 760px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .profile-card.stats-card { grid-column: span 1; }
+            .profile-header { flex-direction: column; text-align: center; gap: 1rem; }
+            .nav-actions { justify-content: center; }
+            .container { padding: 0 1rem; }
+            .info-value { max-width: 55%; font-size: 0.85rem; }
+        }
+        .loading-placeholder { color: #94a3b8; font-style: italic; font-weight: normal; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-farmer">
+        <div class="container">
+            <a href="/farmer/dashboard.html" class="logo">
+                <img src="Logo.png" alt="Logo" onerror="this.src='https://placehold.co/40x40?text=DFM'">
+                <span>Digital Farmers Market</span>
+            </a>
+            <div class="nav-actions">
+                <!-- Dashboard link - black text, badge not here but order badge separate -->
+                <a href="/farmer/dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+                <a href="/farmer/products.html" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
+                <a href="/farmer/orders.html" class="nav-link" id="ordersLink">
+                    <i class="fas fa-truck"></i><span>Orders</span>
+                    <!-- Red background + white number badge (even when 0) -->
+                    <span class="order-badge" id="orderNotificationBadge">0</span>
+                </a>
+                <a href="/farmer/insights.html" class="nav-link"><i class="fas fa-lightbulb"></i><span>Insights</span></a>
+                <a href="/farmer/sales.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Sales</span></a>
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userToggle">
+                        <div class="avatar"><i class="fas fa-tractor"></i></div>
+                        <span id="farmer-name">Mia Alindogan (A) Cabanza</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="/farmer/profile.html" class="active"><i class="fas fa-user"></i> Farm Profile</a>
+                        <a href="#" id="marketplace-link"><i class="fas fa-store"></i> View Marketplace</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="profile-main">
+        <div class="container">
+            <div class="profile-header">
+                <div>
+                    <h1><i class="fas fa-user-farmer"></i> Farm Profile</h1>
+                    <p>Manage your farm & account details</p>
+                </div>
+                <button class="btn-primary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Profile</button>
+            </div>
+
+            <div class="profile-grid">
+                <!-- Farm info card -->
+                <div class="profile-card">
+                    <div class="profile-card-header"><h3><i class="fas fa-tractor"></i> Farm Information</h3></div>
+                    <div class="profile-card-body">
+                        <div class="info-row"><span class="info-label">Farm Name</span><span class="info-value" id="farmName">—</span></div>
+                        <div class="info-row"><span class="info-label">Barangay</span><span class="info-value" id="farmBarangay">—</span></div>
+                        <div class="info-row"><span class="info-label">Description</span><span class="info-value" id="farmDescription">—</span></div>
+                        <div class="info-row"><span class="info-label">Verification</span><span class="info-value" id="verificationStatus"><span class="verification-badge">—</span></span></div>
+                    </div>
+                </div>
+                <!-- Account info card -->
+                <div class="profile-card">
+                    <div class="profile-card-header"><h3><i class="fas fa-user"></i> Account Information</h3></div>
+                    <div class="profile-card-body">
+                        <div class="info-row"><span class="info-label">Full Name</span><span class="info-value" id="fullName">—</span></div>
+                        <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="email">—</span></div>
+                        <div class="info-row"><span class="info-label">Contact</span><span class="info-value" id="contactNumber">—</span></div>
+                        <div class="info-row"><span class="info-label">Address</span><span class="info-value" id="address">—</span></div>
+                    </div>
+                </div>
+                <!-- Stats card -->
+                <div class="profile-card stats-card">
+                    <div class="profile-card-header"><h3><i class="fas fa-chart-bar"></i> Farm Statistics</h3></div>
+                    <div class="profile-card-body">
+                        <div class="stats-grid-mini">
+                            <div class="stat-mini-item"><span class="stat-mini-label">Products</span><span class="stat-mini-value" id="totalProducts">0</span></div>
+                            <div class="stat-mini-item"><span class="stat-mini-label">Orders</span><span class="stat-mini-value" id="totalOrders">0</span></div>
+                            <div class="stat-mini-item"><span class="stat-mini-label">Sales</span><span class="stat-mini-value" id="totalSales">₱0.00</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- EDIT MODAL -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal">
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+            <div class="modal-content">
+                <h2 style="font-size:1.4rem; margin-bottom:0.5rem;"><i class="fas fa-edit"></i> Edit Profile</h2>
+                <form id="editProfileForm">
+                    <div class="form-section-title"><i class="fas fa-tractor"></i> Farm Info</div>
+                    <div class="form-group"><label>Farm Name *</label><input type="text" id="editFarmName" required></div>
+                    <div class="form-group"><label>Barangay</label><input type="text" id="editBarangay" placeholder="e.g., Poblacion"></div>
+                    <div class="form-group"><label>Farm Description</label><textarea id="editFarmDescription" rows="2" placeholder="Tell about your farm..."></textarea></div>
+                    
+                    <div class="form-section-title"><i class="fas fa-user"></i> Account Info</div>
+                    <div class="form-group"><label>Full Name *</label><input type="text" id="editFullName" required></div>
+                    <div class="form-group"><label>Contact Number</label><input type="tel" id="editContactNumber" placeholder="09xxxxxxxxx"></div>
+                    <div class="form-group"><label>Complete Address</label><input type="text" id="editAddress" placeholder="Street, City"></div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-outline" id="cancelEditBtn">Cancel</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!token) { window.location.href = '/auth/login.html'; return; }
+            if (user.role !== 'FARMER') { window.location.href = '/customer/marketplace.html'; return; }
+            
+            // Prefer stored user full name, fallback to "Mia Alindogan (A) Cabanza" as per requirement
+            const displayName = user.full_name || 'Mia Alindogan (A) Cabanza';
+            document.getElementById('farmer-name').innerText = displayName;
+            
+            initDropdown();
+            await loadProfileData();
+            setupEventListeners();
+            startOrderPolling();
+        });
+
+        function initDropdown() {
+            const toggle = document.getElementById('userToggle');
+            const menu = document.getElementById('dropdownMenu');
+            if (!toggle || !menu) return;
+            const newToggle = toggle.cloneNode(true);
+            toggle.parentNode.replaceChild(newToggle, toggle);
+            newToggle.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); });
+            document.addEventListener('click', (e) => {
+                if (!newToggle.contains(e.target) && !menu.contains(e.target)) menu.classList.remove('show');
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('marketplace-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open('/customer/marketplace.html', '_blank');
+            });
+            document.getElementById('editProfileBtn')?.addEventListener('click', openEditModal);
+            document.getElementById('closeModalBtn')?.addEventListener('click', closeEditModal);
+            document.getElementById('cancelEditBtn')?.addEventListener('click', closeEditModal);
+            window.addEventListener('click', (e) => {
+                const modal = document.getElementById('editProfileModal');
+                if (e.target === modal) closeEditModal();
+            });
+            document.getElementById('editProfileForm')?.addEventListener('submit', saveProfileChanges);
+            document.querySelector('.logout-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            });
+        }
+
+        async function loadProfileData() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const userRes = await fetch(`${BACKEND_URL}/api/auth/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (userRes.ok) {
+                    const data = await userRes.json();
+                    const u = data.user;
+                    document.getElementById('fullName').innerText = u.full_name || '—';
+                    document.getElementById('email').innerText = u.email || '—';
+                    document.getElementById('contactNumber').innerText = u.contact_number || '—';
+                    document.getElementById('address').innerText = u.address || '—';
+                    // update farmer name in navbar with actual data
+                    if (u.full_name) document.getElementById('farmer-name').innerText = u.full_name;
+                }
+                const farmerRes = await fetch(`${BACKEND_URL}/api/farmers/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (farmerRes.ok) {
+                    const fd = await farmerRes.json();
+                    const farmer = fd.farmer || {};
+                    const stats = fd.statistics || {};
+                    document.getElementById('farmName').innerText = farmer.farm_name || 'Not set';
+                    document.getElementById('farmBarangay').innerText = farmer.barangay || 'Not set';
+                    document.getElementById('farmDescription').innerText = farmer.farm_description || 'No description added.';
+                    
+                    const verified = farmer.verified_status === true;
+                    const badgeSpan = document.getElementById('verificationStatus');
+                    if (verified) {
+                        badgeSpan.innerHTML = '<span class="verification-badge verified"><i class="fas fa-check-circle"></i> Verified</span>';
+                    } else {
+                        badgeSpan.innerHTML = '<span class="verification-badge pending"><i class="fas fa-clock"></i> Pending Verification</span>';
+                    }
+                    document.getElementById('totalProducts').innerText = stats.total_products || 0;
+                    document.getElementById('totalOrders').innerText = stats.total_orders || 0;
+                    let sales = stats.total_revenue || 0;
+                    document.getElementById('totalSales').innerText = `₱${Number(sales).toFixed(2)}`;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('Failed to load profile', 'error');
+            }
+        }
+
+        function openEditModal() {
+            document.getElementById('editFarmName').value = document.getElementById('farmName').innerText;
+            document.getElementById('editBarangay').value = document.getElementById('farmBarangay').innerText;
+            document.getElementById('editFarmDescription').value = document.getElementById('farmDescription').innerText;
+            document.getElementById('editFullName').value = document.getElementById('fullName').innerText;
+            document.getElementById('editContactNumber').value = document.getElementById('contactNumber').innerText;
+            document.getElementById('editAddress').value = document.getElementById('address').innerText;
+            document.getElementById('editProfileModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        }
+
+        async function saveProfileChanges(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const userData = {
+                full_name: document.getElementById('editFullName').value.trim(),
+                contact_number: document.getElementById('editContactNumber').value.trim(),
+                address: document.getElementById('editAddress').value.trim()
+            };
+            const farmData = {
+                farm_name: document.getElementById('editFarmName').value.trim(),
+                barangay: document.getElementById('editBarangay').value.trim(),
+                farm_description: document.getElementById('editFarmDescription').value.trim()
+            };
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            try {
+                const userUpdate = await fetch(`${BACKEND_URL}/api/auth/update-profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(userData)
+                });
+                if (!userUpdate.ok) throw new Error((await userUpdate.json()).error || 'User update failed');
+                
+                const farmUpdate = await fetch(`${BACKEND_URL}/api/farmers/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(farmData)
+                });
+                if (!farmUpdate.ok) throw new Error((await farmUpdate.json()).error || 'Farm update failed');
+                
+                const stored = JSON.parse(localStorage.getItem('user') || '{}');
+                stored.full_name = userData.full_name;
+                stored.contact_number = userData.contact_number;
+                stored.address = userData.address;
+                localStorage.setItem('user', JSON.stringify(stored));
+                
+                showNotification('Profile updated successfully!', 'success');
+                closeEditModal();
+                await loadProfileData();
+                document.getElementById('farmer-name').innerText = userData.full_name;
+            } catch (err) {
+                console.error(err);
+                showNotification(err.message || 'Error updating profile', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHtml;
+            }
+        }
+
+        function showNotification(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+
+        async function checkPendingOrders() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/orders/farmer`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const orders = data.orders || [];
+                    const pending = orders.filter(o => o && o.status === 'PENDING').length;
+                    const badge = document.getElementById('orderNotificationBadge');
+                    if (badge) {
+                        badge.textContent = pending > 99 ? '99+' : pending;
+                        // badge already has red background + white number forced via CSS
+                        if (pending === 0) {
+                            badge.textContent = '0';
+                        }
+                    }
+                }
+            } catch (err) { console.warn(err); }
+        }
+        function startOrderPolling() {
+            checkPendingOrders();
+            setInterval(checkPendingOrders, 30000);
+        }
+    </script>
+</body>
+</html>

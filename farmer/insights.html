@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Farm Insights - Digital Farmers Market</title>
+    <link rel="icon" type="image/png" href="Logo.png">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/farmer/farmer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Force dark navigation styles with higher specificity */
+        nav.navbar.navbar-farmer .nav-actions .nav-link {
+            color: #000000 !important;
+        }
+        
+        /* Keep Insights (active) white - do not change */
+        nav.navbar.navbar-farmer .nav-actions .nav-link.active {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        nav.navbar.navbar-farmer .nav-actions .nav-link i {
+            color: inherit !important;
+        }
+        
+        /* Keep active link icon white */
+        nav.navbar.navbar-farmer .nav-actions .nav-link.active i {
+            color: white !important;
+        }
+        
+        /* User name - BLACK */
+        .user-dropdown .user-toggle span {
+            color: #000000 !important;
+        }
+        
+        /* Keep badge original style - NOT darkened */
+        .order-badge {
+            background: #ef4444 !important;
+            color: white !important;
+            font-size: 0.6rem !important;
+            padding: 0.1rem 0.4rem !important;
+            border-radius: 10px !important;
+            margin-left: 4px !important;
+            display: inline-block !important;
+        }
+        
+        /* Keep logo and other elements */
+        .badge-farmer {
+            color: #2e7d32;
+        }
+        
+        .logo span {
+            color: #1f2937;
+        }
+
+        .insights-main {
+            padding: 1.5rem 0;
+        }
+
+        .insights-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .insights-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .insights-header p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .insights-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .section-title i {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .view-all {
+            font-size: 0.7rem;
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .view-all:hover {
+            text-decoration: underline;
+        }
+
+        .stats-mini {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-mini {
+            flex: 1;
+            background: var(--bg-light);
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-number-mini {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .stat-number-mini.primary { color: var(--primary); }
+        .stat-number-mini.red { color: #ef4444; }
+        .stat-number-mini.green { color: #10b981; }
+        .stat-number-mini.orange { color: #f59e0b; }
+
+        .stat-label-mini {
+            font-size: 0.6rem;
+            color: var(--text-light);
+            display: block;
+        }
+
+        .product-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .product-mini-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .product-mini-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .product-mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-mini-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .product-mini-score {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 12px;
+        }
+
+        .product-mini-score.high { background: #dcfce7; color: #166534; }
+        .product-mini-score.medium { background: #fef9c3; color: #854d0e; }
+        .product-mini-score.low { background: #fee2e2; color: #991b1b; }
+        .product-mini-score.urgent { background: #fee2e2; color: #dc2626; font-weight: bold; }
+
+        .product-mini-details {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin: 0.5rem 0;
+        }
+
+        .btn-mini {
+            width: 100%;
+            padding: 0.4rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-mini:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-mini.warning {
+            background: #f59e0b;
+        }
+
+        .btn-mini.warning:hover {
+            background: #d97706;
+        }
+
+        .btn-mini.danger {
+            background: #ef4444;
+        }
+
+        .btn-mini.danger:hover {
+            background: #dc2626;
+        }
+
+        .season-tag {
+            font-size: 0.7rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+        }
+
+        .ml-tag {
+            font-size: 0.6rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+
+        .insight-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .insight-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .insight-row:hover {
+            background: var(--bg-light);
+        }
+
+        .row-icon {
+            width: 28px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .row-name {
+            flex: 0 0 100px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .row-bar {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .row-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .row-fill.high { background: #10b981; }
+        .row-fill.medium { background: #f59e0b; }
+        .row-fill.low { background: #ef4444; }
+
+        .row-score {
+            flex: 0 0 35px;
+            text-align: right;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .row-score.high { color: #10b981; }
+        .row-score.medium { color: #f59e0b; }
+        .row-score.low { color: #ef4444; }
+
+        .row-action {
+            flex: 0 0 50px;
+            font-size: 0.65rem;
+            color: var(--primary);
+            text-align: right;
+        }
+
+        /* Price Drop Card Styles - Informational Only (No Apply Button) */
+        .price-drop-card {
+            border: 1px solid #fee2e2;
+            background: #fef2f2;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .price-drop-card.high {
+            border-left: 4px solid #dc2626;
+            background: #fef2f2;
+        }
+
+        .price-drop-card.medium {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+        }
+
+        .price-drop-card.low {
+            border-left: 4px solid #10b981;
+            background: #f0fdf4;
+        }
+
+        .price-drop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-drop-product {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .price-drop-urgency {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .price-drop-urgency.high {
+            background: #dc2626;
+            color: white;
+        }
+
+        .price-drop-urgency.medium {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .price-drop-urgency.low {
+            background: #10b981;
+            color: white;
+        }
+
+        .price-details {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .price-current {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .price-suggested {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .competitor-list {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            margin: 0.5rem 0;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e5e7eb;
+        }
+
+        .info-message {
+            background: #eef2ff;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #4b5563;
+            font-size: 0.8rem;
+        }
+
+        .info-message i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-light);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0.25rem;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        .modal-content {
+            padding: 1rem 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .modal-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .modal-item:hover {
+            border-color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .modal-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-item-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .modal-item-details {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .total-count-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            margin-left: 0.5rem;
+        }
+
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ========== RESPONSIVE NAVIGATION ========== */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar-farmer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .user-toggle:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #059669;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: auto;
+            width: 200px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151 !important;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f9fafb;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 0.5rem 0;
+        }
+
+        .logout-btn {
+            color: #dc2626 !important;
+        }
+
+        @media (max-width: 1000px) {
+            .nav-actions {
+                gap: 0.5rem;
+            }
+            
+            .nav-link span {
+                display: none;
+            }
+            
+            .nav-link {
+                padding: 0.5rem;
+                position: relative;
+            }
+            
+            .nav-link i {
+                font-size: 1.2rem;
+            }
+            
+            .user-toggle span {
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: inline-block;
+            }
+            
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 0 !important;
+                left: auto !important;
+                width: 180px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .navbar-farmer .container {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .logo {
+                margin-right: auto;
+            }
+            
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .user-toggle span {
+                max-width: 80px;
+            }
+            
+            .insights-section {
+                padding: 0.75rem;
+            }
+            .row-name {
+                flex-basis: 80px;
+                font-size: 0.75rem;
+            }
+            .row-action {
+                flex-basis: 40px;
+                font-size: 0.6rem;
+            }
+            .product-mini-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal {
+                width: 95%;
+                max-height: 85vh;
+            }
+            .price-details {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dropdown-menu {
+                right: -10px !important;
+                width: 170px;
+            }
+            
+            .user-toggle span {
+                display: none;
+            }
+            
+            .user-toggle {
+                padding: 0.5rem;
+            }
+            
+            .user-toggle i.fa-chevron-down {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-actions {
+                gap: 0.3rem;
+            }
+            
+            .nav-link {
+                padding: 0.4rem;
+            }
+            
+            .nav-link i {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-farmer">
+        <div class="container">
+            <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="Logo.png" alt="Logo" style="height: 80px; width: auto; border-radius: 8px;">
+                <div>
+                    <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
+                </div>
+            </a>
+            <div class="nav-actions">
+                <a href="/farmer/dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+                <a href="/farmer/products.html" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
+                <a href="/farmer/orders.html" class="nav-link" id="ordersLink"><i class="fas fa-truck"></i><span>Orders</span><span class="order-badge" id="orderNotificationBadge">0</span></a>
+                <a href="/farmer/insights.html" class="nav-link active"><i class="fas fa-lightbulb"></i><span>Insights</span></a>
+                <a href="/farmer/sales.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Sales</span></a>
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userToggle">
+                        <div class="avatar"><i class="fas fa-tractor"></i></div>
+                        <span id="farmer-name"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="/farmer/profile.html"><i class="fas fa-user"></i> Farm Profile</a>
+                        <a href="#" id="marketplace-link"><i class="fas fa-store"></i> View Marketplace</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" id="logoutButton" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="insights-main">
+        <div class="container">
+            <div class="insights-header">
+                <h1><i class="fas fa-chart-line"></i> Farm Insights <span class="ml-tag">ML</span></h1>
+                <p>Market-based recommendations & price optimization</p>
+            </div>
+
+            <!-- Price Drop Recommendations Section - INFORMATIONAL ONLY (No Apply Button) -->
+            <div class="insights-section" id="priceDropSection">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-tags"></i> Price Drop Recommendations
+                        <span class="season-tag" style="background: #fee2e2; color: #dc2626;">⚠️ Competitive Pricing</span>
+                    </div>
+                    <a class="view-all" id="viewAllPriceLink" onclick="showPriceDropModal()" style="display: none;">View All →</a>
+                </div>
+                <div id="priceDropRecommendations"><div class="loading-state">Loading price analysis...</div></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-tractor"></i> Your Farm
+                    </div>
+                    <a class="view-all" onclick="goToProducts()">View All →</a>
+                </div>
+                <div id="farmPerformance"><div class="loading-state">Loading...</div></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-seedling"></i> What to Plant
+                        <span class="season-tag" id="currentSeason">--</span>
+                    </div>
+                    <a class="view-all" onclick="showPlantModal()">View All →</a>
+                </div>
+                <div id="whatToPlant"><div class="loading-state">Loading...</div></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-shopping-cart"></i> What to Sell
+                        <span class="season-tag" id="currentSeasonSell">--</span>
+                    </div>
+                    <a class="view-all" onclick="showSellModal()">View All →</a>
+                </div>
+                <div id="whatToSell"><div class="loading-state">Loading...</div></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-star"></i> Your Priorities
+                        <span class="total-count-badge" id="totalPrioritiesCount">0</span>
+                    </div>
+                    <a class="view-all" id="viewAllPrioritiesLink" onclick="showPrioritiesModal()">View All →</a>
+                </div>
+                <div id="personalizedInsights"><div class="loading-state">Loading...</div></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        const token = localStorage.getItem('token');
+        
+        let plantData = [];
+        let sellData = [];
+        let prioritiesData = [];
+        let priceDropData = [];
+        
+        if (!token) window.location.href = '/auth/login.html';
+
+        function goToProducts() {
+            window.location.href = '/farmer/products.html';
+        }
+
+        function goToAddProduct(productName) {
+            localStorage.setItem('suggestedProduct', productName);
+            window.location.href = '/farmer/products.html?action=add';
+        }
+
+        // Apply price suggestion - REMOVED - function kept but disabled
+        // Price suggestion application has been removed from UI
+        // This function is no longer called anywhere in the UI
+
+        function showPlantModal() {
+            if (plantData.length === 0) return;
+            showModal('🌱 What to Plant', plantData, 'plant');
+        }
+
+        function showSellModal() {
+            if (sellData.length === 0) return;
+            showModal('🛒 What to Sell', sellData, 'sell');
+        }
+
+        function showPrioritiesModal() {
+            if (prioritiesData.length === 0) return;
+            showModal('⭐ Your Priorities', prioritiesData, 'priority');
+        }
+
+        function showPriceDropModal() {
+            if (priceDropData.length === 0) {
+                alert('No price recommendations available at this time.');
+                return;
+            }
+            showModal('💰 Price Drop Recommendations', priceDropData, 'pricedrop');
+        }
+
+        function showModal(title, items, type) {
+            const modalHtml = `
+                <div class="modal-overlay" id="modalOverlay">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3>${title} <span style="font-size: 0.75rem; background: #eef2ff; padding: 0.2rem 0.6rem; border-radius: 20px;">${items.length} items</span></h3>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div class="modal-content">
+                            <div class="modal-grid">
+                                ${items.map(item => {
+                                    if (type === 'plant') {
+                                        let cls = item.demand_score >= 7 ? 'high' : item.demand_score >= 5 ? 'medium' : 'low';
+                                        return `
+                                            <div class="modal-item">
+                                                <div class="modal-item-header">
+                                                    <span class="modal-item-name">${item.product_name}</span>
+                                                    <span class="product-mini-score ${cls}">${item.demand_score}/10</span>
+                                                </div>
+                                                <div class="modal-item-details">
+                                                    ₱${item.expected_price} · ${item.planting_status}
+                                                </div>
+                                            </div>
+                                        `;
+                                    } else if (type === 'sell') {
+                                        let cls = item.demand_score >= 7 ? 'high' : item.demand_score >= 5 ? 'medium' : 'low';
+                                        return `
+                                            <div class="modal-item">
+                                                <div class="modal-item-header">
+                                                    <span class="modal-item-name">${item.product_name}</span>
+                                                    <span class="product-mini-score ${cls}">${item.demand_score}/10</span>
+                                                </div>
+                                                <div class="modal-item-details">
+                                                    ₱${item.price_range_min}-${item.price_range_max} · ${item.search_frequency || 0} searches
+                                                </div>
+                                                <button class="btn-mini" onclick="goToAddProduct('${item.product_name}')" style="margin-top: 0.5rem;">Add to Farm</button>
+                                            </div>
+                                        `;
+                                    } else if (type === 'pricedrop') {
+                                        const urgencyClass = item.urgency === 'high' ? 'urgent' : (item.urgency === 'medium' ? 'medium' : 'low');
+                                        // REMOVED: Apply button - now just informational display
+                                        return `
+                                            <div class="modal-item" style="border-left: 4px solid ${item.urgency === 'high' ? '#dc2626' : (item.urgency === 'medium' ? '#f59e0b' : '#10b981')}">
+                                                <div class="modal-item-header">
+                                                    <span class="modal-item-name">💰 ${item.product_name}</span>
+                                                    <span class="product-mini-score ${urgencyClass}">${item.price_difference_percent}% higher</span>
+                                                </div>
+                                                <div class="modal-item-details">
+                                                    Current: ₱${item.current_price} → Suggested: ₱${item.suggested_price}
+                                                </div>
+                                                <div class="modal-item-details">
+                                                    ${item.competitors_count} competitor(s) selling lower
+                                                </div>
+                                                <div class="competitor-list" style="margin-top: 0.5rem;">
+                                                    <i class="fas fa-store"></i> Competitors: 
+                                                    ${item.competitors ? item.competitors.slice(0, 2).map(c => `${c.farm_name} (₱${c.price})`).join(', ') : 'N/A'}
+                                                    ${item.competitors && item.competitors.length > 2 ? ` +${item.competitors.length - 2} more` : ''}
+                                                </div>
+                                            </div>
+                                        `;
+                                    } else {
+                                        let cls = item.demand_score >= 7 ? 'high' : item.demand_score >= 5 ? 'medium' : 'low';
+                                        let icon = item.type === 'existing' ? '📈' : '🌱';
+                                        let actionText = item.type === 'existing' ? 'Sell' : 'Add';
+                                        return `
+                                            <div class="modal-item" onclick="handlePriorityClick('${item.product_name.replace(/'/g, "\\'")}', '${item.type}', '${item.action.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+                                                <div class="modal-item-header">
+                                                    <span class="modal-item-name">${icon} ${item.product_name}</span>
+                                                    <span class="product-mini-score ${cls}">${item.demand_score}/10</span>
+                                                </div>
+                                                <div class="modal-item-details">
+                                                    ${item.market_price} · ${(item.market_sales || 0).toLocaleString()} sold
+                                                </div>
+                                                <div style="font-size: 0.65rem; color: var(--primary); margin-top: 0.25rem;">${actionText} →</div>
+                                            </div>
+                                        `;
+                                    }
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'modalOverlay') closeModal();
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modalOverlay');
+            if (modal) modal.remove();
+        }
+
+        function handlePriorityClick(productName, type, action) {
+            if (type === 'existing') {
+                window.location.href = '/farmer/products.html';
+            } else {
+                localStorage.setItem('suggestedProduct', productName);
+                window.location.href = '/farmer/products.html?action=add';
+            }
+        }
+
+        function initDropdown() {
+            const userToggle = document.getElementById('userToggle');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (userToggle && dropdownMenu) {
+                const newToggle = userToggle.cloneNode(true);
+                userToggle.parentNode.replaceChild(newToggle, userToggle);
+                newToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('show');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!newToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+        }
+        initDropdown();
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('farmer-name').textContent = user.full_name || '';
+
+        async function checkPendingOrders() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/orders/farmer`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    const pending = (data.orders || []).filter(o => o.status === 'PENDING').length;
+                    const badge = document.getElementById('orderNotificationBadge');
+                    if (badge) {
+                        badge.textContent = pending > 9 ? '9+' : pending;
+                        badge.style.backgroundColor = pending > 0 ? '#ef4444' : '#9ca3af';
+                    }
+                }
+            } catch (e) { console.error(e); }
+        }
+        checkPendingOrders();
+        setInterval(checkPendingOrders, 30000);
+
+        document.getElementById('marketplace-link')?.addEventListener('click', (e) => { e.preventDefault(); window.open('/customer/marketplace.html', '_blank'); });
+        
+        // LOGOUT BUTTON - Redirects to index.html (landing page) as requested
+        const logoutBtn = document.getElementById('logoutButton');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.clear();
+                // Redirect to the main landing page index.html
+                window.location.href = '/index.html';
+            });
+        }
+
+        // Load Price Drop Recommendations - INFORMATIONAL ONLY (No Apply Buttons)
+        async function loadPriceDropRecommendations() {
+            console.log('=== LOADING PRICE DROP RECOMMENDATIONS ===');
+            const container = document.getElementById('priceDropRecommendations');
+            const viewAllLink = document.getElementById('viewAllPriceLink');
+            
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/recommendations/personalized-insights`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const data = await res.json();
+                
+                console.log('API Response:', data);
+                console.log('Price recommendations count:', data.price_drop_recommendations?.length || 0);
+                
+                if (data.success && data.price_drop_recommendations && data.price_drop_recommendations.length > 0) {
+                    priceDropData = data.price_drop_recommendations;
+                    
+                    if (viewAllLink) {
+                        viewAllLink.style.display = 'inline-block';
+                        viewAllLink.innerHTML = `View All ${priceDropData.length} →`;
+                    }
+                    
+                    const displayItems = priceDropData.slice(0, 3);
+                    let html = '';
+                    
+                    for (const rec of displayItems) {
+                        const urgencyClass = rec.urgency;
+                        // REMOVED: btnClass and btnText - no apply buttons anymore
+                        
+                        html += `
+                            <div class="price-drop-card ${urgencyClass}">
+                                <div class="price-drop-header">
+                                    <span class="price-drop-product">💰 ${rec.product_name}</span>
+                                    <span class="price-drop-urgency ${urgencyClass}">
+                                        ${rec.urgency === 'high' ? 'URGENT' : (rec.urgency === 'medium' ? 'Medium Priority' : 'Low Priority')}
+                                    </span>
+                                </div>
+                                <div class="price-details">
+                                    <span>Current: <span class="price-current">₱${rec.current_price}</span></span>
+                                    <span>↓ ${rec.price_difference_percent}% higher</span>
+                                    <span>Suggested: <span class="price-suggested">₱${rec.suggested_price}</span></span>
+                                </div>
+                                <div class="competitor-list">
+                                    <i class="fas fa-store"></i> ${rec.competitors_count} competitor(s) selling lower:
+                                    ${rec.competitors.slice(0, 2).map(c => `${c.farm_name} (₱${c.price})`).join(', ')}
+                                    ${rec.competitors.length > 2 ? ` +${rec.competitors.length - 2} more` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (priceDropData.length > 3) {
+                        html += `<div style="text-align: center; margin-top: 0.5rem;">
+                                    <a class="view-all" onclick="showPriceDropModal()">View all ${priceDropData.length} price recommendations →</a>
+                                </div>`;
+                    }
+                    
+                    container.innerHTML = html;
+                } else {
+                    priceDropData = [];
+                    if (viewAllLink) viewAllLink.style.display = 'none';
+                    
+                    container.innerHTML = `
+                        <div class="info-message">
+                            <i class="fas fa-check-circle"></i> 
+                            <strong>Your prices are competitive!</strong><br>
+                            No price drop recommendations at this time. Your products are priced well compared to other farmers.
+                            <div style="margin-top: 0.5rem; font-size: 0.7rem;">
+                                <i class="fas fa-info-circle"></i> Price recommendations appear when other farmers sell the same product at lower prices.
+                            </div>
+                        </div>
+                    `;
+                }
+                
+            } catch (e) { 
+                console.error('Error loading price drop recommendations:', e);
+                container.innerHTML = `
+                    <div class="info-message">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Unable to load price recommendations. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        async function loadFarm() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/recommendations/farm-performance`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const container = document.getElementById('farmPerformance');
+                
+                if (data.success && data.products && data.products.length > 0) {
+                    const totalSold = data.summary.total_sales || 0;
+                    const displayProducts = data.products.slice(0, 4);
+                    let html = `<div class="stats-mini">
+                        <div class="stat-mini"><div class="stat-number-mini primary">${data.summary.total_products}</div><span class="stat-label-mini">Products</span></div>
+                        <div class="stat-mini"><div class="stat-number-mini">${totalSold}</div><span class="stat-label-mini">Sold</span></div>
+                        <div class="stat-mini"><div class="stat-number-mini">${data.summary.top_product !== 'None' ? data.summary.top_product.substring(0, 10) : '-'}</div><span class="stat-label-mini">Top</span></div>
+                    </div>`;
+                    html += `<div class="product-mini-grid">`;
+                    for (const p of displayProducts) {
+                        html += `<div class="product-mini-card"><div class="product-mini-header"><span class="product-mini-name">${p.product_name}</span><span class="product-mini-score low">${p.total_sold > 0 ? 'Active' : 'Inactive'}</span></div><div class="product-mini-details">₱${p.price || '?'} · ${p.category || 'General'}</div></div>`;
+                    }
+                    html += `</div>`;
+                    if (data.products.length > 4) {
+                        html += `<div style="text-align: center; margin-top: 0.5rem;"><span style="font-size: 0.65rem; color: var(--text-light);">+ ${data.products.length - 4} more products</span></div>`;
+                    }
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<div class="empty-state">No products yet</div>`;
+                }
+            } catch (e) { 
+                console.error(e); 
+                document.getElementById('farmPerformance').innerHTML = `<div class="empty-state">Error loading</div>`;
+            }
+        }
+
+        async function loadPlant() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/recommendations/what-to-plant`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                document.getElementById('currentSeason').innerHTML = `${data.season || '?'} Season`;
+                document.getElementById('currentSeasonSell').innerHTML = `${data.season || '?'} Season`;
+                const container = document.getElementById('whatToPlant');
+                if (data.success && data.recommendations?.length) {
+                    plantData = data.recommendations;
+                    const displayRecs = plantData.slice(0, 4);
+                    let html = `<div class="product-mini-grid">`;
+                    for (const rec of displayRecs) {
+                        let cls = rec.demand_score >= 7 ? 'high' : rec.demand_score >= 5 ? 'medium' : 'low';
+                        html += `<div class="product-mini-card">
+                            <div class="product-mini-header">
+                                <span class="product-mini-name">${rec.product_name}</span>
+                                <span class="product-mini-score ${cls}">${rec.demand_score}/10</span>
+                            </div>
+                            <div class="product-mini-details">₱${rec.expected_price} · ${rec.planting_status.substring(0, 20)}</div>
+                        </div>`;
+                    }
+                    html += `</div>`;
+                    if (plantData.length > 4) {
+                        html += `<div style="text-align: center; margin-top: 0.5rem;"><span style="font-size: 0.65rem; color: var(--text-light);">+ ${plantData.length - 4} more crops</span></div>`;
+                    }
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<div class="empty-state">No data</div>`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadSell() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/recommendations/what-to-sell`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const container = document.getElementById('whatToSell');
+                if (data.success && data.products?.length) {
+                    sellData = data.products;
+                    const displayProducts = sellData.slice(0, 4);
+                    let html = `<div class="product-mini-grid">`;
+                    for (const p of displayProducts) {
+                        let cls = p.demand_score >= 7 ? 'high' : p.demand_score >= 5 ? 'medium' : 'low';
+                        html += `<div class="product-mini-card">
+                            <div class="product-mini-header">
+                                <span class="product-mini-name">${p.product_name}</span>
+                                <span class="product-mini-score ${cls}">${p.demand_score}/10</span>
+                            </div>
+                            <div class="product-mini-details">₱${p.price_range_min}-${p.price_range_max} · ${p.search_frequency || 0} searches</div>
+                            <button class="btn-mini" onclick="event.stopPropagation(); goToAddProduct('${p.product_name}')">Add to Farm</button>
+                        </div>`;
+                    }
+                    html += `</div>`;
+                    if (sellData.length > 4) {
+                        html += `<div style="text-align: center; margin-top: 0.5rem;"><span style="font-size: 0.65rem; color: var(--text-light);">+ ${sellData.length - 4} more products</span></div>`;
+                    }
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<div class="empty-state">No data</div>`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadPriorities() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/recommendations/personalized-insights`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const data = await res.json();
+                const container = document.getElementById('personalizedInsights');
+                const totalBadge = document.getElementById('totalPrioritiesCount');
+                const viewAllLink = document.getElementById('viewAllPrioritiesLink');
+                
+                if (data.success && data.recommendations && data.recommendations.length > 0) {
+                    prioritiesData = data.recommendations;
+                    
+                    const totalProductsCount = prioritiesData.length;
+                    const yourProductsCount = data.farmer_summary?.total_products || 0;
+                    const highPriorityCount = prioritiesData.filter(r => r.demand_score >= 7).length;
+                    const newOpportunitiesCount = prioritiesData.filter(r => r.type === 'new' && r.demand_score >= 7).length;
+                    
+                    if (totalBadge) totalBadge.textContent = totalProductsCount;
+                    if (viewAllLink) viewAllLink.innerHTML = `View All ${totalProductsCount} →`;
+                    
+                    let html = `<div class="stats-mini">
+                        <div class="stat-mini">
+                            <div class="stat-number-mini red">${highPriorityCount}</div>
+                            <span class="stat-label-mini">High Priority</span>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="stat-number-mini green">${newOpportunitiesCount}</div>
+                            <span class="stat-label-mini">New Opps</span>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="stat-number-mini primary">${yourProductsCount}</div>
+                            <span class="stat-label-mini">Your Products</span>
+                        </div>
+                    </div>`;
+                    
+                    html += `<div class="insight-list">`;
+                    
+                    const sortedProducts = [...prioritiesData].sort((a, b) => b.demand_score - a.demand_score);
+                    const displayCount = Math.min(8, totalProductsCount);
+                    
+                    for (let i = 0; i < displayCount; i++) {
+                        const rec = sortedProducts[i];
+                        const score = rec.demand_score;
+                        const scoreClass = score >= 7 ? 'high' : score >= 5 ? 'medium' : 'low';
+                        const fillClass = score >= 7 ? 'high' : score >= 5 ? 'medium' : 'low';
+                        const icon = rec.type === 'existing' ? '📈' : '🌱';
+                        const percent = Math.min(100, Math.round((score / 10) * 100));
+                        const actionText = rec.type === 'existing' ? 'Sell' : 'Add';
+                        
+                        html += `
+                            <div class="insight-row" onclick="handlePriorityClick('${rec.product_name.replace(/'/g, "\\'")}', '${rec.type}', '${rec.action.replace(/'/g, "\\'")}')">
+                                <div class="row-icon">${icon}</div>
+                                <div class="row-name" title="${rec.product_name}">${rec.product_name}</div>
+                                <div class="row-bar"><div class="row-fill ${fillClass}" style="width: ${percent}%"></div></div>
+                                <div class="row-score ${scoreClass}">${score}/10</div>
+                                <div class="row-action">${actionText}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `</div>`;
+                    
+                    if (totalProductsCount > 8) {
+                        html += `<div style="text-align: center; margin-top: 0.75rem;">
+                                    <a class="view-all" onclick="showPrioritiesModal()">View all ${totalProductsCount} priorities →</a>
+                                </div>`;
+                    }
+                    container.innerHTML = html;
+                } else {
+                    if (totalBadge) totalBadge.textContent = '0';
+                    if (viewAllLink) viewAllLink.innerHTML = 'View All →';
+                    container.innerHTML = `<div class="empty-state">Add products to get priorities</div>`;
+                }
+            } catch (e) { 
+                console.error('Error loading priorities:', e); 
+                document.getElementById('personalizedInsights').innerHTML = `<div class="empty-state">Error loading</div>`;
+                const totalBadge = document.getElementById('totalPrioritiesCount');
+                if (totalBadge) totalBadge.textContent = '0';
+            }
+        }
+
+        async function loadAll() {
+            await Promise.all([loadFarm(), loadPlant(), loadSell(), loadPriorities(), loadPriceDropRecommendations()]);
+        }
+
+        loadAll();
+    </script>
+</body>
+</html>

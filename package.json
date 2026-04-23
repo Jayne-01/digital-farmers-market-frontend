@@ -1,0 +1,18 @@
+{
+  "name": "digital-farmers-market-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Digital Farmers Market",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^3.0.5",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

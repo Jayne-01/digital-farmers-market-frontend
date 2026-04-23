@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sales Report - Farmer Dashboard</title>
+    <link rel="icon" type="image/png" href="Logo.png">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/farmer/farmer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        nav.navbar.navbar-farmer .nav-actions .nav-link {
+            color: #000000 !important;
+        }
+        
+        nav.navbar.navbar-farmer .nav-actions .nav-link.active {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        nav.navbar.navbar-farmer .nav-actions .nav-link i {
+            color: inherit !important;
+        }
+        
+        nav.navbar.navbar-farmer .nav-actions .nav-link.active i {
+            color: white !important;
+        }
+        
+        .user-dropdown .user-toggle span {
+            color: #000000 !important;
+        }
+        
+        .order-badge {
+            background: #ef4444 !important;
+            color: white !important;
+            font-size: 0.6rem !important;
+            padding: 0.1rem 0.4rem !important;
+            border-radius: 10px !important;
+            margin-left: 4px !important;
+            display: inline-block !important;
+        }
+        
+        .badge-farmer {
+            color: #2e7d32;
+        }
+        
+        .logo span {
+            color: #1f2937;
+        }
+
+        .sales-main {
+            padding: 1.5rem 0;
+        }
+
+        .sales-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sales-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .sales-header p {
+            color: #6b7280;
+            margin: 0.25rem 0 0;
+            font-size: 0.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .period-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #16a34a;
+        }
+
+        .sales-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .summary-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .summary-icon {
+            width: 48px;
+            height: 48px;
+            background: #dcfce7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #22c55e;
+            font-size: 1.25rem;
+        }
+
+        .summary-info {
+            flex: 1;
+        }
+
+        .summary-label {
+            font-size: 0.7rem;
+            color: #6b7280;
+            display: block;
+        }
+
+        .summary-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: block;
+        }
+
+        .chart-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-color.green { background: #16a34a; }
+        .legend-color.blue { background: #3b82f6; }
+        .legend-color.yellow { background: #eab308; }
+
+        #salesChart {
+            max-height: 350px;
+            width: 100%;
+        }
+
+        .performance-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .performance-section h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .performance-table th,
+        .performance-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .performance-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .performance-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .percentage-bar {
+            position: relative;
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .percentage-fill {
+            background: #22c55e;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .percentage-bar span {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .deleted-badge {
+            background: #fef3c7;
+            color: #d97706;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+            display: inline-block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ========== RESPONSIVE NAVIGATION ========== */
+        .navbar-farmer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .user-toggle:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #059669;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            left: auto;
+            width: 200px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151 !important;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f9fafb;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 0.5rem 0;
+        }
+
+        .logout-btn {
+            color: #dc2626 !important;
+        }
+
+        @media (max-width: 1000px) {
+            .nav-actions {
+                gap: 0.5rem;
+            }
+            
+            .nav-link span {
+                display: none;
+            }
+            
+            .nav-link {
+                padding: 0.5rem;
+                position: relative;
+            }
+            
+            .nav-link i {
+                font-size: 1.2rem;
+            }
+            
+            .user-toggle span {
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: inline-block;
+            }
+            
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 0 !important;
+                left: auto !important;
+                width: 180px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .navbar-farmer .container {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .logo {
+                margin-right: auto;
+            }
+            
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .user-toggle span {
+                max-width: 80px;
+            }
+            
+            .sales-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .sales-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .performance-table th, 
+            .performance-table td {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+            
+            .chart-legend {
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dropdown-menu {
+                right: -10px !important;
+                width: 170px;
+            }
+            
+            .user-toggle span {
+                display: none;
+            }
+            
+            .user-toggle {
+                padding: 0.5rem;
+            }
+            
+            .user-toggle i.fa-chevron-down {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-actions {
+                gap: 0.3rem;
+            }
+            
+            .nav-link {
+                padding: 0.4rem;
+            }
+            
+            .nav-link i {
+                font-size: 1rem;
+            }
+            
+            .sales-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-farmer">
+        <div class="container">
+            <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="Logo.png" alt="Logo" style="height: 80px; width: auto; border-radius: 8px;">
+                <div><span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span></div>
+            </a>
+            <div class="nav-actions">
+                <a href="/farmer/dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+                <a href="/farmer/products.html" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
+                <a href="/farmer/orders.html" class="nav-link" id="ordersLink"><i class="fas fa-truck"></i><span>Orders</span><span class="order-badge" id="orderNotificationBadge">0</span></a>
+                <a href="/farmer/insights.html" class="nav-link"><i class="fas fa-lightbulb"></i><span>Insights</span></a>
+                <a href="/farmer/sales.html" class="nav-link active"><i class="fas fa-chart-line"></i><span>Sales</span></a>
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userToggle">
+                        <div class="avatar"><i class="fas fa-tractor"></i></div>
+                        <span id="farmer-name"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="/farmer/profile.html"><i class="fas fa-user"></i> Farm Profile</a>
+                        <a href="#" id="marketplace-link"><i class="fas fa-store"></i> View Marketplace</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="sales-main">
+        <div class="container">
+            <div class="sales-header">
+                <div>
+                    <h1>Sales Report</h1>
+                    <p>Accurate sales data including all delivered orders</p>
+                </div>
+                <div class="header-actions">
+                    <select id="reportPeriod" class="period-select">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly" selected>Monthly</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="exportReport()"><i class="fas fa-download"></i> Export</button>
+                </div>
+            </div>
+
+            <!-- Summary Cards - ACCURATE TOTALS -->
+            <div class="sales-summary">
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-peso-sign"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Total Sales</span>
+                        <span class="summary-value" id="totalSales">₱0.00</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Total Orders</span>
+                        <span class="summary-value" id="totalOrders">0</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-boxes"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Items Sold</span>
+                        <span class="summary-value" id="totalItems">0</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon"><i class="fas fa-tag"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Avg. Order Value</span>
+                        <span class="summary-value" id="avgOrder">₱0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Chart -->
+            <div class="chart-container">
+                <h2>Sales Trend <span style="font-size: 0.7rem; color: #d97706;">(Yellow = Deleted products)</span></h2>
+                <div class="chart-legend">
+                    <div class="legend-item"><div class="legend-color green"></div><span>Total Sales (₱)</span></div>
+                    <div class="legend-item"><div class="legend-color blue"></div><span>Orders</span></div>
+                    <div class="legend-item"><div class="legend-color yellow"></div><span>Deleted Products Sales (₱)</span></div>
+                </div>
+                <canvas id="salesChart"></canvas>
+            </div>
+
+            <!-- Product Performance -->
+            <div class="performance-section">
+                <h2>Product Performance <span style="font-size: 0.7rem; color: #d97706;">(Includes deleted products)</span></h2>
+                <div class="table-responsive">
+                    <table class="performance-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Quantity Sold</th>
+                                <th>Revenue</th>
+                                <th>% of Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performanceTableBody">
+                            <tr><td colspan="5" class="loading-state">Loading performance data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        let salesChart = null;
+        let allOrders = [];
+
+        // Helper: Check if product is deleted
+        function isProductDeleted(item) {
+            if (item.is_deleted === true) return true;
+            if (item.has_snapshot === true && (!item.product_name || item.product_name === 'null')) return true;
+            if ((!item.product_name || item.product_name === 'null' || item.product_name === 'undefined') && 
+                item.product_name_snapshot && item.product_name_snapshot !== 'null') return true;
+            return false;
+        }
+
+        // Helper: Get display product name
+        function getDisplayProductName(item) {
+            if (item.product_name_snapshot && item.product_name_snapshot !== 'null' && item.product_name_snapshot.trim() !== '') {
+                return item.product_name_snapshot;
+            }
+            if (item.product_name && item.product_name !== 'null' && item.product_name !== 'undefined' && item.product_name.trim() !== '') {
+                return item.product_name;
+            }
+            return `Product #${item.product_id} (Deleted)`;
+        }
+
+        // Helper: Filter orders by period
+        function filterOrdersByPeriod(orders, period) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            return orders.filter(order => {
+                const orderDate = new Date(order.order_date);
+                
+                if (period === 'weekly') {
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(today.getDate() - 7);
+                    return orderDate >= weekAgo;
+                } 
+                else if (period === 'monthly') {
+                    const monthAgo = new Date(today);
+                    monthAgo.setMonth(today.getMonth() - 1);
+                    return orderDate >= monthAgo;
+                }
+                else if (period === 'yearly') {
+                    const yearAgo = new Date(today);
+                    yearAgo.setFullYear(today.getFullYear() - 1);
+                    return orderDate >= yearAgo;
+                }
+                else {
+                    return true; // 'all' period - return all orders
+                }
+            });
+        }
+
+        function initDropdown() {
+            const userToggle = document.getElementById('userToggle');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (userToggle && dropdownMenu) {
+                const newToggle = userToggle.cloneNode(true);
+                userToggle.parentNode.replaceChild(newToggle, userToggle);
+                newToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    dropdownMenu.classList.toggle('show');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!newToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!token) { window.location.href = '/auth/login.html'; return; }
+            if (user.role !== 'FARMER') { window.location.href = '/customer/marketplace.html'; return; }
+            document.getElementById('farmer-name').textContent = user.full_name || '';
+            initDropdown();
+            loadSalesData();
+            setupEventListeners();
+            startOrderPolling();
+        });
+
+        function startOrderPolling() { checkPendingOrders(); setInterval(checkPendingOrders, 30000); }
+
+        async function checkPendingOrders() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                const response = await fetch(`${BACKEND_URL}/api/orders/farmer`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) return;
+                const data = await response.json();
+                let orders = [];
+                if (data.success && data.orders) orders = data.orders;
+                else if (data.data) orders = data.data;
+                else if (Array.isArray(data)) orders = data;
+                const pendingCount = orders.filter(o => o && o.status === 'PENDING').length;
+                const badge = document.getElementById('orderNotificationBadge');
+                if (badge) {
+                    if (pendingCount > 0) { badge.textContent = pendingCount > 9 ? '9+' : pendingCount; badge.style.backgroundColor = '#ef4444'; badge.classList.add('has-orders'); }
+                    else { badge.textContent = '0'; badge.style.backgroundColor = '#9ca3af'; badge.classList.remove('has-orders'); }
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('marketplace-link').addEventListener('click', function(e) { e.preventDefault(); window.open('/customer/marketplace.html', '_blank'); });
+            document.getElementById('reportPeriod').addEventListener('change', function() { refreshSalesData(); });
+            document.querySelector('.logout-btn').addEventListener('click', function(e) { e.preventDefault(); logout(); });
+        }
+
+        async function loadSalesData() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${BACKEND_URL}/api/orders/farmer`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const ordersData = await response.json();
+                
+                let orders = [];
+                if (ordersData.orders) orders = ordersData.orders;
+                else if (ordersData.data) orders = ordersData.data;
+                else if (Array.isArray(ordersData)) orders = ordersData;
+                
+                // Store all orders for filtering
+                allOrders = orders.filter(o => o.status?.toUpperCase() === 'DELIVERED');
+                
+                console.log(`📊 Loaded ${allOrders.length} delivered orders`);
+                
+                refreshSalesData();
+            } catch (error) {
+                console.error('Error loading sales data:', error);
+                showNotification('Error loading sales data: ' + error.message, 'error');
+            }
+        }
+
+        function refreshSalesData() {
+            const period = document.getElementById('reportPeriod').value;
+            const filteredOrders = filterOrdersByPeriod(allOrders, period);
+            
+            console.log(`📈 Showing ${filteredOrders.length} orders for period: ${period}`);
+            
+            if (filteredOrders.length === 0) {
+                document.getElementById('totalSales').textContent = '₱0.00';
+                document.getElementById('totalOrders').textContent = '0';
+                document.getElementById('totalItems').textContent = '0';
+                document.getElementById('avgOrder').textContent = '₱0.00';
+                document.getElementById('performanceTableBody').innerHTML = '<tr><td colspan="5" class="empty-state">No sales data for this period</td></tr>';
+                updateChart([], [], [], period);
+                return;
+            }
+            
+            processSalesData(filteredOrders, period);
+        }
+
+        function processSalesData(orders, period) {
+            const totalSales = orders.reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0);
+            const totalOrders = orders.length;
+            
+            let totalItems = 0;
+            const productMap = new Map();
+
+            orders.forEach(order => {
+                const items = order.items || order.order_items || order.products || [];
+                items.forEach(item => {
+                    const quantity = parseInt(item.quantity) || 1;
+                    totalItems += quantity;
+                    const productName = getDisplayProductName(item);
+                    const isDeleted = isProductDeleted(item);
+                    const category = item.category || 'Uncategorized';
+                    const price = parseFloat(item.price) || 0;
+                    const key = `${productName}_${item.product_id}`;
+
+                    if (!productMap.has(key)) {
+                        productMap.set(key, {
+                            product_id: item.product_id,
+                            product_name: productName,
+                            category: category,
+                            quantity_sold: 0,
+                            revenue: 0,
+                            is_deleted: isDeleted
+                        });
+                    }
+                    const p = productMap.get(key);
+                    p.quantity_sold += quantity;
+                    p.revenue += price * quantity;
+                    if (isDeleted) p.is_deleted = true;
+                });
+            });
+
+            const avgOrder = totalOrders > 0 ? totalSales / totalOrders : 0;
+            
+            document.getElementById('totalSales').textContent = `₱${totalSales.toFixed(2)}`;
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('avgOrder').textContent = `₱${avgOrder.toFixed(2)}`;
+
+            console.log(`📊 Summary: ${totalOrders} orders, ₱${totalSales.toFixed(2)} total sales, ${totalItems} items`);
+
+            const products = Array.from(productMap.values()).sort((a, b) => b.revenue - a.revenue);
+            updatePerformanceTable(products, totalSales);
+            createChartWithDeletedProducts(orders, period);
+        }
+
+        function updatePerformanceTable(products, totalRevenue) {
+            const tbody = document.getElementById('performanceTableBody');
+            if (!products || products.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No sales data available</td></tr>'; 
+                return; 
+            }
+            
+            tbody.innerHTML = products.map(product => {
+                const percentage = totalRevenue > 0 ? ((product.revenue / totalRevenue) * 100).toFixed(1) : '0';
+                const deletedBadge = product.is_deleted ? '<span class="deleted-badge"><i class="fas fa-trash-alt"></i> Deleted</span>' : '';
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(product.product_name)}</strong>${deletedBadge}</td>
+                        <td>${escapeHtml(product.category)}</td>
+                        <td>${product.quantity_sold.toLocaleString()}</td>
+                        <td>₱${product.revenue.toFixed(2)}</td>
+                        <td>
+                            <div class="percentage-bar">
+                                <div class="percentage-fill" style="width: ${percentage}%"></div>
+                                <span>${percentage}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) { 
+            if (!str) return ''; 
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); 
+        }
+
+        function createChartWithDeletedProducts(orders, period) {
+            if (!orders || orders.length === 0) { 
+                updateChart([], [], [], period); 
+                return; 
+            }
+            
+            const salesByDate = {};
+            const deletedSalesByDate = {};
+
+            orders.forEach(order => {
+                const date = new Date(order.order_date);
+                let key;
+                
+                if (period === 'weekly') {
+                    key = date.toLocaleDateString('en-US', { weekday: 'short' });
+                } else if (period === 'monthly') {
+                    key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                } else if (period === 'yearly') {
+                    key = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                } else {
+                    key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+
+                if (!salesByDate[key]) { 
+                    salesByDate[key] = { total_sales: 0, total_orders: 0 }; 
+                    deletedSalesByDate[key] = 0; 
+                }
+                
+                salesByDate[key].total_sales += parseFloat(order.total_amount) || 0;
+                salesByDate[key].total_orders += 1;
+
+                const items = order.items || order.order_items || order.products || [];
+                let deletedSalesAmount = 0;
+                items.forEach(item => {
+                    if (isProductDeleted(item)) {
+                        const price = parseFloat(item.price) || 0;
+                        const quantity = parseInt(item.quantity) || 1;
+                        deletedSalesAmount += price * quantity;
+                    }
+                });
+                deletedSalesByDate[key] += deletedSalesAmount;
+            });
+
+            const labels = Object.keys(salesByDate);
+            const salesValues = labels.map(key => salesByDate[key].total_sales);
+            const orderValues = labels.map(key => salesByDate[key].total_orders);
+            const deletedSalesValues = labels.map(key => deletedSalesByDate[key] || 0);
+
+            const sorted = labels.map((label, idx) => ({ label, idx })).sort((a, b) => {
+                const dateA = new Date(a.label);
+                const dateB = new Date(b.label);
+                return dateA - dateB;
+            });
+            
+            const sortedLabels = sorted.map(s => s.label);
+            const sortedSales = sorted.map(s => salesValues[s.idx]);
+            const sortedOrders = sorted.map(s => orderValues[s.idx]);
+            const sortedDeleted = sorted.map(s => deletedSalesValues[s.idx]);
+
+            updateChart(sortedLabels, sortedSales, sortedOrders, period, sortedDeleted);
+        }
+
+        function updateChart(labels, salesValues, orderValues, period, deletedSalesValues = []) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if (salesChart) salesChart.destroy();
+            
+            if (!labels || labels.length === 0) {
+                salesChart = new Chart(ctx, { 
+                    type: 'line', 
+                    data: { labels: ['No Data'], datasets: [
+                        { label: 'Total Sales (₱)', data: [0], borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.1)', borderWidth: 2, tension: 0.4, fill: true },
+                        { label: 'Orders', data: [0], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 2, tension: 0.4, fill: true }
+                    ] }, 
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } } 
+                });
+                return;
+            }
+
+            const datasets = [
+                { label: 'Total Sales (₱)', data: salesValues, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.1)', borderWidth: 2, tension: 0.4, fill: true, yAxisID: 'y-sales' },
+                { label: 'Orders', data: orderValues, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', borderWidth: 2, tension: 0.4, fill: true, yAxisID: 'y-orders' }
+            ];
+            
+            const hasDeletedSales = deletedSalesValues && deletedSalesValues.some(v => v > 0);
+            if (hasDeletedSales) {
+                datasets.push({ label: 'Deleted Products Sales (₱)', data: deletedSalesValues, borderColor: '#eab308', backgroundColor: 'rgba(234,179,8,0.1)', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: true, yAxisID: 'y-sales' });
+            }
+
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { 
+                        legend: { position: 'top', labels: { font: { size: 11 } } }, 
+                        tooltip: { 
+                            mode: 'index', 
+                            intersect: false, 
+                            callbacks: { 
+                                label: function(context) { 
+                                    let label = context.dataset.label || ''; 
+                                    let value = context.raw; 
+                                    if (label.includes('Sales') || label.includes('Deleted')) return `${label}: ₱${value.toFixed(2)}`; 
+                                    return `${label}: ${value}`; 
+                                } 
+                            } 
+                        } 
+                    },
+                    scales: { 
+                        'y-sales': { 
+                            type: 'linear', 
+                            display: true, 
+                            position: 'left', 
+                            title: { display: true, text: 'Sales (₱)', font: { size: 11 } }, 
+                            ticks: { callback: function(value) { return '₱' + value.toLocaleString(); } } 
+                        }, 
+                        'y-orders': { 
+                            type: 'linear', 
+                            display: true, 
+                            position: 'right', 
+                            title: { display: true, text: 'Number of Orders', font: { size: 11 } }, 
+                            grid: { drawOnChartArea: false } 
+                        } 
+                    }
+                }
+            });
+        }
+
+        function exportReport() {
+            const period = document.getElementById('reportPeriod').value;
+            const periodNames = { weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly', all: 'All Time' };
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            const BOM = '\uFEFF';
+            let csv = [];
+
+            csv.push(`"${periodNames[period]} Sales Report - ${dateStr}"`);
+            csv.push('"Note: This report includes data from deleted products"');
+            csv.push('');
+            csv.push('"PRODUCT PERFORMANCE"');
+            csv.push('"Product","Category","Quantity Sold","Revenue (PHP)","Status"');
+
+            document.querySelectorAll('#performanceTableBody tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 4 && !cells[0].classList.contains('empty-state') && !cells[0].classList.contains('loading-state')) {
+                    let product = cells[0].textContent.trim().replace(/"/g, '""');
+                    let category = cells[1].textContent.trim().replace(/"/g, '""');
+                    const quantity = cells[2].textContent.trim();
+                    let revenue = cells[3].textContent.trim().replace('₱', '').replace(/,/g, '');
+                    let status = product.includes('Deleted') ? 'DELETED' : 'ACTIVE';
+                    product = product.replace(/\(Deleted\)/g, '').replace(/Deleted/g, '').trim();
+                    csv.push(`"${product}","${category}",${quantity},${revenue},"${status}"`);
+                }
+            });
+
+            csv.push('');
+            csv.push('"SUMMARY"');
+            const totalOrders = document.getElementById('totalOrders').textContent;
+            const totalItems = document.getElementById('totalItems').textContent;
+            const totalSales = document.getElementById('totalSales').textContent.replace('₱', '').replace(/,/g, '');
+            const avgOrder = document.getElementById('avgOrder').textContent.replace('₱', '').replace(/,/g, '');
+            csv.push(`"Total Sales","PHP ${parseFloat(totalSales).toFixed(2)}"`);
+            csv.push(`"Total Orders","${totalOrders}"`);
+            csv.push(`"Total Items Sold","${totalItems}"`);
+            csv.push(`"Average Order Value","PHP ${parseFloat(avgOrder).toFixed(2)}"`);
+            csv.push('');
+            csv.push('"REPORT INFORMATION"');
+            csv.push(`"Report Generated","${today.toLocaleString()}"`);
+            csv.push(`"Period","${periodNames[period]}"`);
+            csv.push(`"Includes Deleted Products","Yes"`);
+
+            const csvContent = BOM + csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${periodNames[period]}_Sales_Report_${dateStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showNotification('Report exported successfully');
+        }
+
+        function showNotification(message, type = 'success') {
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideOut 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }
+    </script>
+</body>
+</html>

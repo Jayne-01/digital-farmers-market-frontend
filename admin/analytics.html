@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Analytics - Digital Farmers Market</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="/Logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/api.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #f9fafb; 
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* SIDEBAR - Fixed/sticky on desktop */
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+            height: 100%;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            flex-shrink: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid #374151; }
+        .sidebar-header .logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            color: white; text-decoration: none; font-weight: 600; font-size: 1.125rem;
+        }
+        .sidebar-header .logo i { color: #10b981; }
+        
+        .user-info { 
+            padding: 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            border-bottom: 1px solid #374151;
+        }
+        .user-info .user-logo {
+            flex-shrink: 0;
+        }
+        .user-info .user-logo img {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; 
+            background: #10b981;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5rem;
+        }
+        .user-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .user-details h4 {
+            margin: 0;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .badge-admin {
+            background: #10b981; 
+            color: white; 
+            font-size: 0.75rem; 
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px; 
+            margin-top: 0.25rem; 
+            display: inline-block;
+        }
+        
+        .sidebar-nav { padding: 1rem 0; }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            transition: background 0.2s;
+            position: relative;
+            justify-content: space-between;
+        }
+        .sidebar-nav a .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sidebar-nav a .badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border-radius: 9999px;
+            padding: 0.2rem 0.55rem;
+            min-width: 1.5rem;
+            text-align: center;
+            line-height: 1.2;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-nav a.active {
+            background: rgba(16,185,129,0.2); color: #10b981;
+            border-left: 4px solid #10b981;
+        }
+        .sidebar-nav a i { width: 20px; text-align: center; }
+        .sidebar-footer {
+            padding: 1rem 1.5rem; border-top: 1px solid #374151;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 0.75rem; color: #d1d5db;
+            text-decoration: none; padding: 0.5rem; border-radius: 0.375rem;
+            transition: background 0.2s;
+        }
+        .sidebar-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .logout-btn {
+            display: flex; align-items: center; gap: 0.75rem; color: #d1d5db;
+            text-decoration: none; padding: 0.5rem; border-radius: 0.375rem;
+            transition: background 0.2s;
+            background: none;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .logout-btn:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+        
+        /* MAIN CONTENT */
+        .admin-main {
+            flex: 1;
+            padding: 2rem;
+            background: #f9fafb;
+            min-height: 100vh;
+            width: 100%;
+            transition: padding 0.3s ease;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 240px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .admin-sidebar {
+                width: 100%;
+                min-height: auto;
+                position: relative;
+                top: 0;
+                position: static;
+                flex-shrink: 0;
+            }
+            .sidebar-header {
+                padding: 1rem;
+            }
+            .user-info {
+                padding: 1rem;
+            }
+            .user-info .user-logo img {
+                height: 40px;
+            }
+            .avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            .sidebar-nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 0.5rem;
+                gap: 0.25rem;
+            }
+            .sidebar-nav a {
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                margin: 0.25rem;
+                width: auto;
+            }
+            .sidebar-nav a.active {
+                border-left: none;
+                border-bottom: 2px solid #10b981;
+            }
+            .sidebar-footer {
+                flex-direction: row;
+                justify-content: center;
+                gap: 1rem;
+                padding: 0.75rem;
+            }
+            .sidebar-footer .sidebar-link, 
+            .sidebar-footer .logout-btn {
+                width: auto;
+                padding: 0.5rem 1rem;
+            }
+            .admin-main {
+                padding: 1rem;
+            }
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            .stats-grid {
+                gap: 1rem;
+            }
+            .table-container {
+                padding: 1rem;
+            }
+            th, td {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar-nav a {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            .sidebar-nav a .badge {
+                font-size: 0.6rem;
+                padding: 0.15rem 0.4rem;
+            }
+            .user-info .user-logo img {
+                height: 35px;
+            }
+            .avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            .admin-main {
+                padding: 0.75rem;
+            }
+            .stat-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+            .stat-content h3 {
+                font-size: 1.25rem;
+            }
+            .range-selector {
+                justify-content: flex-start;
+            }
+            th, td {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.7rem;
+            }
+            .btn-primary {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .page-header h1 {
+            font-size: 1.875rem;
+            color: #1f2937;
+        }
+        
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        .stat-content { 
+            flex: 1; 
+            min-width: 0;
+        }
+        .stat-content h3 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+        .stat-content p {
+            margin: 0.25rem 0 0;
+            color: #6b7280;
+            font-size: 0.8rem;
+        }
+        .stat-sub {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+        
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 2rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .section-title i {
+            color: #10b981;
+        }
+        
+        /* TABLE CONTAINER */
+        .table-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        .table-container h3 {
+            margin-bottom: 1rem;
+            color: #374151;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .table-container h3 i {
+            color: #10b981;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        tr:hover { background: #f9fafb; }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { background: #f3f4f6; }
+        .btn-primary {
+            background: #10b981;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover { background: #059669; }
+        .btn-primary i {
+            margin-right: 0.5rem;
+        }
+        
+        .loading { text-align: center; padding: 2rem; color: #6b7280; }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .fade-out { animation: fadeOut 0.3s ease forwards; }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        
+        /* CHART CONTAINERS */
+        .chart-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 992px) {
+            .chart-row {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        .range-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .range-btn {
+            padding: 0.25rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        .range-btn.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .range-btn:hover:not(.active) {
+            background: #f3f4f6;
+            border-color: #10b981;
+        }
+        
+        .chart-wrapper {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .chart-header h3 {
+            margin: 0;
+            font-size: 1.125rem;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .chart-header h3 i {
+            color: #10b981;
+        }
+        
+        .chart-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 0.5rem;
+        }
+        .chart-loading i {
+            font-size: 2rem;
+            color: #10b981;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-wrapper {
+                height: 250px;
+                min-height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .chart-wrapper {
+                height: 220px;
+                min-height: 220px;
+            }
+        }
+        
+        /* Prevent FOUC (Flash of Unstyled Content) */
+        .no-fouc { visibility: hidden; }
+        .no-fouc.ready { visibility: visible; }
+    </style>
+</head>
+<body class="no-fouc">
+    <div class="admin-sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="logo">
+                <i class="fas fa-seedling"></i>
+                <span>Admin Panel</span>
+            </a>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-logo">
+                <img src="/farmer/Logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="avatar" style="display: none;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+            </div>
+            <div class="user-details">
+                <h4 id="admin-name">Admin</h4>
+                <span class="badge-admin">ADMIN</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="/admin/dashboard.html">
+                <div class="nav-left"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></div>
+            </a>
+            <a href="/admin/users.html">
+                <div class="nav-left"><i class="fas fa-users"></i> <span>Users</span></div>
+                <span class="badge" id="pending-users-badge">0</span>
+            </a>
+            <a href="/admin/farmers.html">
+                <div class="nav-left"><i class="fas fa-tractor"></i> <span>Farmers</span></div>
+                <span class="badge" id="pending-farmers-badge">0</span>
+            </a>
+            <a href="/admin/products.html">
+                <div class="nav-left"><i class="fas fa-apple-alt"></i> <span>Products</span></div>
+                <span class="badge" id="pending-products-badge">0</span>
+            </a>
+            <a href="/admin/orders.html">
+                <div class="nav-left"><i class="fas fa-shopping-cart"></i> <span>Orders</span></div>
+                <span class="badge" id="orders-badge">0</span>
+            </a>
+            <a href="/admin/analytics.html" class="active">
+                <div class="nav-left"><i class="fas fa-chart-line"></i> <span>Analytics</span></div>
+            </a>
+            <a href="/admin/settings.html">
+                <div class="nav-left"><i class="fas fa-cog"></i> <span>Settings</span></div>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/" class="sidebar-link"><i class="fas fa-home"></i> <span>Visit Site</span></a>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        </div>
+    </div>
+
+    <div class="admin-main">
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-chart-pie" style="color: #10b981; margin-right: 0.5rem;"></i>
+                Analytics Dashboard
+            </h1>
+            <button class="btn btn-primary" onclick="refreshAllData()">
+                <i class="fas fa-sync-alt"></i>
+                Refresh All Data
+            </button>
+        </div>
+
+        <div class="stats-grid" id="summary-cards">
+            <div class="loading">Loading summary...</div>
+        </div>
+
+        <div class="chart-row">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> User Growth</h3>
+                    <div class="range-selector" id="userGrowthRange">
+                        <button class="range-btn" data-days="7" onclick="loadUserGrowth(7, this)">7 Days</button>
+                        <button class="range-btn active" data-days="30" onclick="loadUserGrowth(30, this)">30 Days</button>
+                        <button class="range-btn" data-days="90" onclick="loadUserGrowth(90, this)">90 Days</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+                <div id="userGrowthLoading" class="chart-loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-bar"></i> Sales Overview</h3>
+                    <div class="range-selector" id="salesRange">
+                        <button class="range-btn" data-days="7" onclick="loadSalesData(7, this)">7 Days</button>
+                        <button class="range-btn active" data-days="30" onclick="loadSalesData(30, this)">30 Days</button>
+                        <button class="range-btn" data-days="90" onclick="loadSalesData(90, this)">90 Days</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div id="salesLoading" class="chart-loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">
+            <i class="fas fa-chart-pie"></i>
+            Detailed Statistics
+        </h2>
+
+        <div class="table-container" id="user-stats-container">
+            <h3><i class="fas fa-users"></i> User Statistics</h3>
+            <div class="loading">Loading user statistics...</div>
+        </div>
+
+        <div class="table-container" id="product-stats-container">
+            <h3><i class="fas fa-box-open"></i> Product Statistics</h3>
+            <div class="loading">Loading product statistics...</div>
+        </div>
+
+        <div class="table-container" id="order-stats-container">
+            <h3><i class="fas fa-shopping-cart"></i> Order Statistics</h3>
+            <div class="loading">Loading order statistics...</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Remove FOUC class after page loads
+            document.body.classList.remove('no-fouc');
+            document.body.classList.add('ready');
+        })();
+
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        let userGrowthChart = null;
+        let salesChart = null;
+        let resizeTimer = null;
+        let isPageLoading = true;
+
+        function getToken() {
+            return localStorage.getItem('token') || localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+        }
+
+        function handleChartResize() {
+            if (resizeTimer) clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (userGrowthChart && !isPageLoading) {
+                    userGrowthChart.resize();
+                }
+                if (salesChart && !isPageLoading) {
+                    salesChart.resize();
+                }
+            }, 150);
+        }
+
+        async function updateAllSidebarBadges() {
+            const token = getToken();
+            if (!token) return;
+            
+            try {
+                const analyticsRes = await fetch(`${API_BASE_URL}/admin/analytics`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (analyticsRes.ok) {
+                    const analytics = await analyticsRes.json();
+                    const totalOrders = analytics.summary?.total_orders || 0;
+                    const ordersBadge = document.getElementById('orders-badge');
+                    if (ordersBadge) ordersBadge.textContent = totalOrders;
+                }
+                
+                const usersRes = await fetch(`${API_BASE_URL}/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (usersRes.ok) {
+                    const usersData = await usersRes.json();
+                    const users = usersData.users || [];
+                    const inactiveUsers = users.filter(u => u.status === 'INACTIVE').length;
+                    const usersBadge = document.getElementById('pending-users-badge');
+                    if (usersBadge) usersBadge.textContent = inactiveUsers > 99 ? '99+' : inactiveUsers;
+                }
+                
+                const farmersRes = await fetch(`${API_BASE_URL}/admin/farmers/pending-verifications`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (farmersRes.ok) {
+                    const farmersData = await farmersRes.json();
+                    const pendingFarmers = farmersData.pending_verifications || [];
+                    const farmersBadge = document.getElementById('pending-farmers-badge');
+                    if (farmersBadge) farmersBadge.textContent = pendingFarmers.length > 99 ? '99+' : pendingFarmers.length;
+                }
+                
+                const productsRes = await fetch(`${API_BASE_URL}/admin/products`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (productsRes.ok) {
+                    const productsData = await productsRes.json();
+                    const products = productsData.products || [];
+                    const pendingProducts = products.filter(p => p.status === 'PENDING').length;
+                    const productsBadge = document.getElementById('pending-products-badge');
+                    if (productsBadge) productsBadge.textContent = pendingProducts > 99 ? '99+' : pendingProducts;
+                }
+                
+            } catch (error) {
+                console.error('Failed to update sidebar badges:', error);
+            }
+        }
+
+        function showToast(message, type = 'success', duration = 5000) {
+            const existing = document.querySelectorAll('.toast');
+            existing.forEach(t => t.remove());
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        function checkAuth() {
+            const token = getToken();
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token) {
+                showToast('Please login first', 'error');
+                setTimeout(() => {
+                    window.location.href = '/admin/login.html';
+                }, 2000);
+                return false;
+            }
+            
+            if (user.role !== 'ADMIN') {
+                showToast('Admin access required', 'error');
+                setTimeout(() => {
+                    window.location.href = '/admin/login.html';
+                }, 2000);
+                return false;
+            }
+            return true;
+        }
+
+        async function apiRequest(endpoint, options = {}) {
+            const token = getToken();
+            if (!token) {
+                window.location.href = '/admin/login.html';
+                return null;
+            }
+            
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            headers['Authorization'] = `Bearer ${token}`;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.href = '/admin/login.html';
+                    return null;
+                }
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || data.message || 'Request failed');
+                return data;
+            } catch (error) {
+                console.error('API request error:', error);
+                throw error;
+            }
+        }
+
+        async function refreshAllData() {
+            if (!checkAuth()) return;
+            showToast('Refreshing all data...', 'info', 1500);
+            await loadAllData();
+            
+            const activeUserBtn = document.querySelector('#userGrowthRange .range-btn.active');
+            const activeSalesBtn = document.querySelector('#salesRange .range-btn.active');
+            const userDays = activeUserBtn ? parseInt(activeUserBtn.getAttribute('data-days')) : 30;
+            const salesDays = activeSalesBtn ? parseInt(activeSalesBtn.getAttribute('data-days')) : 30;
+            
+            await loadUserGrowth(userDays, activeUserBtn);
+            await loadSalesData(salesDays, activeSalesBtn);
+            await updateAllSidebarBadges();
+            showToast('All data refreshed successfully!', 'success');
+        }
+
+        async function loadAllData() {
+            if (!checkAuth()) return;
+            try {
+                const data = await apiRequest('/admin/analytics');
+                if (data.success && data.summary) {
+                    renderSummary(data.summary);
+                    await loadDetailedStats();
+                }
+            } catch (error) {
+                console.error('Failed to load analytics:', error);
+                showToast('Error loading analytics: ' + error.message, 'error');
+            }
+        }
+
+        async function loadDetailedStats() {
+            try {
+                const usersData = await apiRequest('/admin/users');
+                const productsData = await apiRequest('/admin/products');
+                const ordersData = await apiRequest('/admin/orders');
+                renderDetailedStats(usersData, productsData, ordersData);
+            } catch (error) {
+                console.error('Failed to load detailed stats:', error);
+            }
+        }
+
+        function renderSummary(summary) {
+            const container = document.getElementById('summary-cards');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-content">
+                        <h3>${(summary.total_users || 0).toLocaleString()}</h3>
+                        <p>Total Users</p>
+                        <div class="stat-sub">👤 ${(summary.total_customers || 0).toLocaleString()} Customers • 🌾 ${(summary.total_farmers || 0).toLocaleString()} Farmers</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+                    <div class="stat-content">
+                        <h3>${(summary.total_products || 0).toLocaleString()}</h3>
+                        <p>Total Products</p>
+                        <div class="stat-sub">✅ ${(summary.available_products || 0).toLocaleString()} Available • ⏳ ${(summary.pending_products || 0).toLocaleString()} Pending</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="stat-content">
+                        <h3>${(summary.total_orders || 0).toLocaleString()}</h3>
+                        <p>Total Orders</p>
+                        <div class="stat-sub">📦 ${(summary.pending_orders || 0).toLocaleString()} Pending • ✅ ${(summary.completed_orders || 0).toLocaleString()} Completed</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-content">
+                        <h3>₱${(summary.total_revenue || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h3>
+                        <p>Total Revenue</p>
+                        <div class="stat-sub">💰 From Delivered Orders Only</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDetailedStats(usersData, productsData, ordersData) {
+            const users = usersData.users || [];
+            const products = productsData.products || [];
+            const orders = ordersData.orders || [];
+
+            const activeUsers = users.filter(u => u.status === 'ACTIVE').length;
+            const inactiveUsers = users.filter(u => u.status === 'INACTIVE').length;
+            const admins = users.filter(u => u.role === 'ADMIN').length;
+            const farmers = users.filter(u => u.role === 'FARMER').length;
+            const customers = users.filter(u => u.role === 'CUSTOMER').length;
+
+            document.getElementById('user-stats-container').innerHTML = `
+                <h3><i class="fas fa-users"></i> User Statistics</h3>
+                <table><thead><tr><th>User Type</th><th>Count</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td class="detail-label"><i class="fas fa-user-shield"></i> Administrators</td><td>${admins}</td><td><span class="badge badge-info">Active</span></td></tr>
+                    <tr><td class="detail-label"><i class="fas fa-tractor"></i> Farmers</td><td>${farmers}</td><td><span class="badge badge-info">Active</span></td></tr>
+                    <tr><td class="detail-label"><i class="fas fa-user"></i> Customers</td><td>${customers}</td><td><span class="badge badge-info">Active</span></td></tr>
+                    <tr><td class="detail-label"><i class="fas fa-check-circle"></i> Active Users<td colspan="2"><span class="badge badge-success">${activeUsers} Active</span></td></tr>
+                    <tr><td class="detail-label"><i class="fas fa-times-circle"></i> Inactive Users<td colspan="2"><span class="badge badge-danger">${inactiveUsers} Inactive</span></td></tr>
+                </tbody></table>
+            `;
+
+            const availableProducts = products.filter(p => p.status === 'AVAILABLE').length;
+            const soldProducts = products.filter(p => p.status === 'SOLD' || p.status === 'UNAVAILABLE').length;
+            const removedProducts = products.filter(p => p.status === 'REMOVED').length;
+
+            document.getElementById('product-stats-container').innerHTML = `
+                <h3><i class="fas fa-box-open"></i> Product Statistics</h3>
+                <table><thead><tr><th>Status</th><th>Count</th><th>Percentage</th></tr></thead>
+                <tbody>
+                    <tr><td class="detail-label"><span class="badge badge-success">Available</span></td><td>${availableProducts}</td><td>${products.length ? ((availableProducts / products.length) * 100).toFixed(1) : 0}%</td></tr>
+                    <tr><td class="detail-label"><span class="badge badge-info">Sold / Unavailable</span></td><td>${soldProducts}</td><td>${products.length ? ((soldProducts / products.length) * 100).toFixed(1) : 0}%</td></tr>
+                    <tr><td class="detail-label"><span class="badge badge-danger">Removed</span></td><td>${removedProducts}</td><td>${products.length ? ((removedProducts / products.length) * 100).toFixed(1) : 0}%</td></tr>
+                    <tr style="background: #f9fafb; font-weight: 600;"><td class="detail-label">Total Products<td colspan="2">${products.length}</td></tr>
+                </tbody></table>
+            `;
+
+            const pendingOrdersAmount = orders.filter(o => (o.order_status === 'PENDING' || o.status === 'PENDING')).reduce((sum, o) => sum + parseFloat(o.total_amount || o.total || 0), 0);
+            const confirmedOrdersAmount = orders.filter(o => (o.order_status === 'CONFIRMED' || o.status === 'CONFIRMED')).reduce((sum, o) => sum + parseFloat(o.total_amount || o.total || 0), 0);
+            const inTransitOrdersAmount = orders.filter(o => (o.order_status === 'IN_TRANSIT' || o.status === 'IN_TRANSIT' || o.order_status === 'SHIPPED' || o.status === 'SHIPPED')).reduce((sum, o) => sum + parseFloat(o.total_amount || o.total || 0), 0);
+            const deliveredOrdersAmount = orders.filter(o => (o.order_status === 'DELIVERED' || o.status === 'DELIVERED')).reduce((sum, o) => sum + parseFloat(o.total_amount || o.total || 0), 0);
+            const cancelledOrdersAmount = orders.filter(o => (o.order_status === 'CANCELLED' || o.status === 'CANCELLED')).reduce((sum, o) => sum + parseFloat(o.total_amount || o.total || 0), 0);
+            
+            const pendingOrdersCount = orders.filter(o => (o.order_status === 'PENDING' || o.status === 'PENDING')).length;
+            const confirmedOrdersCount = orders.filter(o => (o.order_status === 'CONFIRMED' || o.status === 'CONFIRMED')).length;
+            const inTransitOrdersCount = orders.filter(o => (o.order_status === 'IN_TRANSIT' || o.status === 'IN_TRANSIT' || o.order_status === 'SHIPPED' || o.status === 'SHIPPED')).length;
+            const deliveredOrdersCount = orders.filter(o => (o.order_status === 'DELIVERED' || o.status === 'DELIVERED')).length;
+            const cancelledOrdersCount = orders.filter(o => (o.order_status === 'CANCELLED' || o.status === 'CANCELLED')).length;
+            const totalRevenue = deliveredOrdersAmount;
+
+            document.getElementById('order-stats-container').innerHTML = `
+                <h3><i class="fas fa-shopping-cart"></i> Order Statistics</h3>
+                <p style="margin-bottom: 1rem; font-size: 0.875rem; color: #6b7280;"><i class="fas fa-info-circle"></i> Revenue is calculated only from <strong>Delivered</strong> orders.</p>
+                <table><thead><tr><th>Status</th><th>Count</th><th>Amount (₱)</th></tr></thead>
+                <tbody>
+                    <tr><td class="detail-label"><span class="badge badge-warning">Pending</span></td><td>${pendingOrdersCount}</td><td>₱${pendingOrdersAmount.toFixed(2)}</td></tr>
+                    <tr><td class="detail-label"><span class="badge badge-info">Confirmed</span></td><td>${confirmedOrdersCount}</td><td>₱${confirmedOrdersAmount.toFixed(2)}</td></tr>
+                    <tr><td class="detail-label"><span class="badge badge-purple">In Transit / Shipped</span></td><td>${inTransitOrdersCount}</td><td>₱${inTransitOrdersAmount.toFixed(2)}</td></tr>
+                    <tr><td class="detail-label"><span class="badge badge-success">Delivered</span></td><td>${deliveredOrdersCount}</td><td>₱${deliveredOrdersAmount.toFixed(2)}</td></tr>
+                    <tr><td class="detail-label"><span class="badge badge-danger">Cancelled</span></td><td>${cancelledOrdersCount}</td><td>₱${cancelledOrdersAmount.toFixed(2)}</td></tr>
+                    <tr style="background: #f9fafb; font-weight: 600;"><td class="detail-label">Total Orders<td colspan="2">${orders.length}</td></tr>
+                    <tr style="background: #f0fdf4;"><td class="detail-label">Total Revenue (Delivered Only)<td colspan="2">₱${totalRevenue.toFixed(2)}</td></tr>
+                    <tr style="background: #f0fdf4;"><td class="detail-label">Completion Rate<td colspan="2">${orders.length ? ((deliveredOrdersCount / orders.length) * 100).toFixed(1) : 0}% of total orders</td></tr>
+                </tbody></table>
+            `;
+        }
+
+        async function loadUserGrowth(days = 30, button) {
+            if (!checkAuth()) return;
+            if (button) {
+                const parent = button.parentElement;
+                Array.from(parent.children).forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            }
+            const loadingDiv = document.getElementById('userGrowthLoading');
+            loadingDiv.style.display = 'flex';
+            try {
+                const data = await apiRequest(`/admin/analytics/user-growth?days=${days}`);
+                const labels = data.labels || [];
+                const values = data.values || [];
+                const ctx = document.getElementById('userGrowthChart').getContext('2d');
+                if (userGrowthChart) userGrowthChart.destroy();
+                userGrowthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: labels.length ? labels : ['No Data'], datasets: [{ label: 'New Users', data: values.length ? values : [0], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true, pointBackgroundColor: '#10b981', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }] },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (context) => `Users: ${context.raw}` } } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } } }
+                });
+            } catch (error) {
+                console.error('Failed to load user growth:', error);
+            } finally { loadingDiv.style.display = 'none'; }
+        }
+
+        async function loadSalesData(days = 30, button) {
+            if (!checkAuth()) return;
+            if (button) {
+                const parent = button.parentElement;
+                Array.from(parent.children).forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            }
+            const loadingDiv = document.getElementById('salesLoading');
+            loadingDiv.style.display = 'flex';
+            try {
+                const data = await apiRequest(`/admin/analytics/sales?days=${days}`);
+                const labels = data.labels || [];
+                const values = data.values || [];
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                if (salesChart) salesChart.destroy();
+                salesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: labels.length ? labels : ['No Data'], datasets: [{ label: 'Sales (₱)', data: values.length ? values : [0], backgroundColor: '#10b981', borderRadius: 6, barPercentage: 0.7 }] },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (context) => `₱${context.raw.toFixed(2)}` } } }, scales: { y: { beginAtZero: true, ticks: { callback: (value) => '₱' + value.toFixed(2) } } } }
+                });
+            } catch (error) {
+                console.error('Failed to load sales data:', error);
+            } finally { loadingDiv.style.display = 'none'; }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+            window.location.href = '/admin/login.html';
+        });
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('admin-name').textContent = user.full_name || 'Admin';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Analytics page loaded');
+            if (checkAuth()) {
+                await loadAllData();
+                await loadUserGrowth(30, document.querySelector('#userGrowthRange .active'));
+                await loadSalesData(30, document.querySelector('#salesRange .active'));
+                await updateAllSidebarBadges();
+                window.addEventListener('resize', handleChartResize);
+                setTimeout(() => { isPageLoading = false; }, 500);
+                setInterval(async () => { if (getToken()) await updateAllSidebarBadges(); }, 30000);
+            }
+        });
+
+        window.refreshAllData = refreshAllData;
+        window.loadUserGrowth = loadUserGrowth;
+        window.loadSalesData = loadSalesData;
+    </script>
+</body>
+</html>
