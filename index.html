@@ -14,28 +14,63 @@
         @media (min-width: 992px) {
             .hero-content h1 {
                 white-space: nowrap;
-                font-size: 2.2rem; /* Adjust this value if needed */
+                font-size: 2.2rem;
             }
         }
         
-        /* For larger screens, increase font size slightly */
         @media (min-width: 1200px) {
             .hero-content h1 {
                 font-size: 2.5rem;
             }
         }
+
+        /* ===== BACKGROUND PICTURE ONLY FOR FEATURES SECTION ===== */
+        /* How It Works section will be WHITE */
+        
+        .features {
+            background-image: url('Background picture.jpg') !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: scroll !important;
+            background-color: transparent !important;
+        }
+
+        /* Make How It Works background WHITE */
+        .how-it-works {
+            background: #ffffff !important;
+        }
+
+        /* Keep the white cards so text is readable */
+        .feature-card {
+            background: hsl(99, 54%, 95%) !important;
+        }
+
+        .step {
+            background: rgba(237, 244, 236, 0.95) !important;
+        }
+
+        /* Make section titles visible */
+        .features .section-title {
+            color: #000000 !important;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .how-it-works .section-title {
+            color: #000000 !important;
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation - ORIGINAL colors from your CSS files (unchanged) -->
     <nav class="navbar">
         <div class="container">
            <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-    <img src="farmer/Logo.png" alt="Logo" style="height: 100px; width: auto; border-radius: 8px;">
-    <div>
-        <span style="font-weight: 900; font-size: 2.0rem;">Digital Farmers Market</span>
-    </div>
-</a>
+                <img src="farmer/Logo.png" alt="Logo" style="height: 100px; width: auto; border-radius: 8px;">
+                <div>
+                    <span style="font-weight: 900; font-size: 2.0rem;">Digital Farmers Market</span>
+                </div>
+           </a>
             
             <div class="nav-links">
                 <a href="#features">Features</a>
@@ -69,7 +104,7 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Features Section (ONLY this section has the picture background) -->
     <section id="features" class="section features">
         <div class="container">
             <h2 class="section-title">Key Features</h2>
@@ -109,7 +144,7 @@
         </div>
     </section>
 
-    <!-- How It Works -->
+    <!-- How It Works Section (WHITE background) -->
     <section id="how-it-works" class="section how-it-works">
         <div class="container">
             <h2 class="section-title">How It Works</h2>
@@ -176,7 +211,6 @@
                 menuToggle.addEventListener('click', function() {
                     navLinks.classList.toggle('active');
                     
-                    // Change icon
                     const icon = menuToggle.querySelector('i');
                     if (navLinks.classList.contains('active')) {
                         icon.classList.remove('fa-bars');
@@ -187,7 +221,6 @@
                     }
                 });
                 
-                // Close menu when clicking a link
                 navLinks.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', function() {
                         navLinks.classList.remove('active');
@@ -197,7 +230,6 @@
                     });
                 });
                 
-                // Close menu when clicking outside
                 document.addEventListener('click', function(event) {
                     if (!navLinks.contains(event.target) && !menuToggle.contains(event.target)) {
                         navLinks.classList.remove('active');
