@@ -2,23 +2,458 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Register - Digital Farmers Market</title>
     <link rel="icon" type="image/png" href="/Logo.png">
-    <link rel="stylesheet" href="/css/components.css">
-    <link rel="stylesheet" href="/auth/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e9f5e9 0%, #cde3cd 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .auth-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 24px;
+        }
+        
+        .logo img {
+            height: 60px;
+            width: auto;
+            border-radius: 8px;
+        }
+        
+        .logo span {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1f2937;
+        }
+        
+        .auth-header h2 {
+            font-size: 1.75rem;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .auth-header p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .auth-form {
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .form-group label i {
+            color: #10b981;
+            width: 20px;
+            margin-right: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        
+        .form-group input.error-input,
+        .form-group select.error-input {
+            border-color: #dc2626;
+            background-color: #fef2f2;
+        }
+        
+        /* Name row layout */
+        .name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .suffix-row {
+            margin-top: 4px;
+        }
+        
+        .suffix-row select {
+            width: auto;
+            min-width: 120px;
+            display: inline-block;
+            margin-right: 12px;
+        }
+        
+        .form-text {
+            display: inline-block;
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-left: 8px;
+        }
+        
+        .form-text i {
+            color: #10b981;
+            margin-right: 4px;
+        }
+        
+        /* Password wrapper */
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        
+        .toggle-password:hover {
+            color: #10b981;
+        }
+        
+        /* Checkbox */
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        
+        .checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+        
+        .terms-link {
+            color: #10b981;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .terms-link:hover {
+            color: #059669;
+        }
+        
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary.loading {
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .auth-footer p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+        
+        .auth-footer a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 0.8rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            padding: 28px;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            margin-bottom: 16px;
+        }
+        
+        .modal-header i {
+            font-size: 3rem;
+            color: #10b981;
+            margin-bottom: 12px;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: #1f2937;
+        }
+        
+        .modal-body {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .modal-footer button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .modal-footer button:hover {
+            background: #059669;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: calc(100% - 40px);
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+        
+        .fa-spinner {
+            animation: spin 0.7s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 550px) {
+            .auth-card {
+                padding: 32px 20px;
+            }
+            .logo img {
+                height: 50px;
+            }
+            .auth-header h2 {
+                font-size: 1.5rem;
+            }
+            .name-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+        
+        /* Textarea readonly style */
+        textarea[readonly] {
+            background-color: #f9fafb;
+            cursor: default;
+        }
+        
+        /* Select styling */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
+    <div id="loadingOverlay" class="loading-overlay" style="display: flex;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="auth-container" id="authContainer" style="display: none;">
         <div class="auth-card">
             <div class="auth-header">
-                <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-    <img src="../farmer/Logo.png" alt="Logo" style="height: 80px; width: auto; border-radius: 8px;">
-    <div>
-        <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
-    </div>
-</a>
+                <a href="/farmer/dashboard.html" class="logo">
+                    <img src="../farmer/Logo.png" alt="Logo" onerror="this.src='/Logo.png'">
+                    <span>Digital Farmers Market</span>
+                </a>
                 <h2>Create Account</h2>
                 <p>Join as a customer</p>
             </div>
@@ -28,31 +463,17 @@
                 
                 <!-- Full Name Section -->
                 <div class="form-group">
-                    <label>Full Name *</label>
-                    
-                    <!-- First Row: First Name + Middle Name -->
+                    <label><i class="fas fa-user"></i> Full Name *</label>
                     <div class="name-row">
-                        <div class="first-name">
-                            <input type="text" name="first_name" placeholder="First Name" required>
-                        </div>
-                        <div class="middle-name">
-                            <input type="text" name="middle_name" placeholder="Middle Name">
-                        </div>
+                        <input type="text" name="first_name" id="firstName" placeholder="First Name" required>
+                        <input type="text" name="middle_name" id="middleName" placeholder="Middle Name">
                     </div>
-                    
-                    <!-- Second Row: Middle Initial + Last Name -->
                     <div class="name-row">
-                        <div class="middle-initial">
-                            <input type="text" name="middle_initial" placeholder="MI" maxlength="2" style="text-transform: uppercase;">
-                        </div>
-                        <div class="last-name">
-                            <input type="text" name="last_name" placeholder="Last Name" required>
-                        </div>
+                        <input type="text" name="middle_initial" id="middleInitial" placeholder="MI" maxlength="2" style="text-transform: uppercase;">
+                        <input type="text" name="last_name" id="lastName" placeholder="Last Name" required>
                     </div>
-                    
-                    <!-- Suffix Row -->
                     <div class="suffix-row">
-                        <select name="suffix">
+                        <select name="suffix" id="suffix">
                             <option value="">Suffix</option>
                             <option value="Jr.">Jr.</option>
                             <option value="Sr.">Sr.</option>
@@ -67,15 +488,15 @@
                 
                 <!-- Email -->
                 <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" name="email" required placeholder="admin@gmail.com">
+                    <label><i class="fas fa-envelope"></i> Email *</label>
+                    <input type="email" name="email" id="email" required placeholder="your@email.com">
                 </div>
                 
                 <!-- Password -->
                 <div class="form-group">
-                    <label>Password *</label>
+                    <label><i class="fas fa-lock"></i> Password *</label>
                     <div class="password-wrapper">
-                        <input type="password" name="password" id="password" required placeholder="Enter password">
+                        <input type="password" name="password" id="password" required placeholder="Enter password (min. 6 characters)">
                         <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
                             <i class="far fa-eye" id="password-icon"></i>
                         </button>
@@ -84,7 +505,7 @@
 
                 <!-- Confirm Password -->
                 <div class="form-group">
-                    <label>Confirm Password *</label>
+                    <label><i class="fas fa-check-circle"></i> Confirm Password *</label>
                     <div class="password-wrapper">
                         <input type="password" name="confirm_password" id="confirm_password" required placeholder="Re-enter password">
                         <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm_password')">
@@ -95,13 +516,13 @@
                 
                 <!-- Contact Number -->
                 <div class="form-group">
-                    <label>Contact Number *</label>
-                    <input type="tel" name="contact_number" required placeholder="09123456789">
+                    <label><i class="fas fa-phone"></i> Contact Number *</label>
+                    <input type="tel" name="contact_number" id="contactNumber" required placeholder="09123456789">
                 </div>
                 
                 <!-- Barangay Selection -->
                 <div class="form-group">
-                    <label>Barangay *</label>
+                    <label><i class="fas fa-map-marker-alt"></i> Barangay *</label>
                     <select name="barangay" id="barangaySelect" required>
                         <option value="">Select Barangay</option>
                         <option value="A. Bonifacio (Tinurilan)">A. Bonifacio (Tinurilan)</option>
@@ -173,27 +594,27 @@
 
                 <!-- Street/Purok -->
                 <div class="form-group">
-                    <label>Street/Purok *</label>
+                    <label><i class="fas fa-road"></i> Street/Purok *</label>
                     <input type="text" id="streetPurok" name="street_purok" placeholder="Enter your street or purok" required>
                 </div>
 
                 <!-- Complete Address -->
                 <div class="form-group">
-                    <label>Complete Address</label>
-                    <textarea name="address" id="completeAddress" rows="2" required readonly placeholder="Complete address will appear here" style="background-color: #f9fafb;"></textarea>
+                    <label><i class="fas fa-location-dot"></i> Complete Address</label>
+                    <textarea name="address" id="completeAddress" rows="2" required readonly style="background-color: #f9fafb;"></textarea>
                     <small class="form-text">Address is automatically generated from your selections</small>
                 </div>
                 
                 <!-- Terms Checkbox -->
                 <div class="form-group">
                     <label class="checkbox">
-                        <input type="checkbox" name="terms" required>
+                        <input type="checkbox" name="terms" id="termsCheckbox" required>
                         <span>I agree to the <span class="terms-link" onclick="showTermsModal()">Terms of Service and Privacy Policy</span></span>
                     </label>
                 </div>
                 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-primary" id="registerBtn">
                     <i class="fas fa-user-plus"></i> Create Account
                 </button>
             </form>
@@ -224,6 +645,30 @@
     </div>
     
     <script>
+        // Toast notification
+        let toastTimer = null;
+        let currentToast = null;
+        
+        function showToast(message, type = 'success', duration = 3000) {
+            if (currentToast && currentToast.remove) currentToast.remove();
+            if (toastTimer) clearTimeout(toastTimer);
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            document.body.appendChild(toast);
+            currentToast = toast;
+            
+            toastTimer = setTimeout(() => {
+                if (toast) {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => toast.remove(), 300);
+                }
+                toastTimer = null;
+            }, duration);
+        }
+        
         // Modal functions
         function showTermsModal() {
             document.getElementById('termsModal').classList.add('show');
@@ -262,7 +707,7 @@
         const completeAddress = document.getElementById('completeAddress');
         
         function updateAddress() {
-            const barangay = barangaySelect.value;
+            const barangay = barangaySelect ? barangaySelect.value : '';
             const street = streetPurok ? streetPurok.value.trim() : '';
             
             if (barangay) {
@@ -286,36 +731,37 @@
             streetPurok.addEventListener('input', updateAddress);
         }
         
-        // Form submission - UPDATED to only send what backend expects
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        // Form submission
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        
+        registerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
             
             if (password !== confirmPassword) {
-                alert('❌ Passwords do not match!');
+                showToast('Passwords do not match!', 'error');
                 return;
             }
             
             if (password.length < 6) {
-                alert('❌ Password must be at least 6 characters!');
+                showToast('Password must be at least 6 characters!', 'error');
                 return;
             }
             
             const formData = new FormData(this);
             
             // Get name components
-            const firstName = formData.get('first_name') || '';
-            const middleName = formData.get('middle_name') || '';
-            const middleInitial = formData.get('middle_initial') || '';
-            const lastName = formData.get('last_name') || '';
-            const suffix = formData.get('suffix') || '';
+            const firstName = document.getElementById('firstName').value || '';
+            const middleName = document.getElementById('middleName').value || '';
+            const middleInitial = document.getElementById('middleInitial').value || '';
+            const lastName = document.getElementById('lastName').value || '';
+            const suffix = document.getElementById('suffix').value || '';
             
-            // Build the full name properly (for backend)
+            // Build the full name properly
             let fullName = firstName;
-            
-            // Handle middle name/initial
             if (middleName && middleInitial) {
                 fullName += ` ${middleName} (${middleInitial})`;
             } else if (middleName) {
@@ -323,44 +769,38 @@
             } else if (middleInitial) {
                 fullName += ` ${middleInitial}.`;
             }
-            
             fullName += ` ${lastName}`;
-            
             if (suffix) {
                 fullName += `, ${suffix}`;
             }
             
-            // Create data object - ONLY sending what backend expects
+            // Create data object
             const data = {
-                full_name: fullName,                    // Backend expects this
-                email: formData.get('email'),
+                full_name: fullName,
+                email: document.getElementById('email').value,
                 password: password.trim(),
-                confirm_password: password.trim(),      // Backend expects this
-                contact_number: formData.get('contact_number'),
-                barangay: formData.get('barangay'),
-                address: formData.get('address')
-                // NOT sending: first_name, middle_name, middle_initial, last_name, suffix, terms, street_purok, role
+                confirm_password: password.trim(),
+                contact_number: document.getElementById('contactNumber').value,
+                barangay: barangaySelect?.value || '',
+                address: completeAddress.value
             };
-            
-            console.log('Sending to backend:', data);   // Verify full_name is included
             
             // Validate required fields
             if (!fullName || !data.email || !data.contact_number || !data.barangay || !data.address) {
-                alert('❌ Please fill in all required fields');
+                showToast('Please fill in all required fields', 'error');
                 return;
             }
             
-            // Check terms checkbox
-            if (!document.querySelector('input[name="terms"]').checked) {
-                alert('❌ Please agree to the Terms of Service');
+            if (!document.getElementById('termsCheckbox').checked) {
+                showToast('Please agree to the Terms of Service', 'error');
                 return;
             }
             
             // Show loading
-            const btn = this.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-            btn.disabled = true;
+            const originalText = registerBtn.innerHTML;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            registerBtn.disabled = true;
+            registerBtn.classList.add('loading');
             
             try {
                 const res = await fetch('https://digital-farmers-market-backend-1.onrender.com/api/auth/register', {
@@ -370,24 +810,52 @@
                 });
                 
                 const result = await res.json();
-                console.log('Backend response:', result);
                 
                 if (res.ok && result.success) {
                     localStorage.setItem('token', result.token);
                     localStorage.setItem('user', JSON.stringify(result.user));
-                    alert('✅ Registration successful!');
-                    window.location.href = '/customer/marketplace.html';
+                    showToast('Registration successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/customer/marketplace.html';
+                    }, 800);
                 } else {
                     throw new Error(result.error || 'Registration failed');
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                alert('❌ Registration failed: ' + error.message);
+                showToast('Registration failed: ' + error.message, 'error');
             } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                registerBtn.innerHTML = originalText;
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
             }
         });
+        
+        // Initialize page - Hide loading overlay
+        (function init() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const authContainer = document.getElementById('authContainer');
+            
+            if (loadingOverlay) {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 200);
+            }
+            
+            if (authContainer) {
+                authContainer.style.display = 'block';
+                authContainer.style.opacity = '0';
+                authContainer.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    authContainer.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    authContainer.style.opacity = '1';
+                    authContainer.style.transform = 'translateY(0)';
+                }, 50);
+            }
+            
+            console.log('✅ Registration page loaded');
+        })();
     </script>
 </body>
 </html>

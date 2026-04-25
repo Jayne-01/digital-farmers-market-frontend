@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>System Settings - Digital Farmers Market</title>
     
-  <!-- FORCE REDIRECT - THIS RUNS BEFORE ANYTHING ELSE -->
+    <!-- FORCE REDIRECT - THIS RUNS BEFORE ANYTHING ELSE -->
     <script>
-        // Immediately check and redirect - using async but with immediate action
         (function() {
-            // First, hide the body immediately to prevent flash of content
             document.documentElement.style.display = 'none';
             
             fetch('http://localhost:5000/api/maintenance-status')
@@ -20,7 +18,6 @@
                         sessionStorage.clear();
                         window.location.replace('/maintenance.html');
                     } else {
-                        // Show the page if maintenance is off
                         document.documentElement.style.display = '';
                     }
                 })
@@ -34,12 +31,25 @@
     <link rel="icon" type="image/png" href="/Logo.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: #f9fafb; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Main layout wrapper */
+        .app-wrapper {
             display: flex;
             min-height: 100vh;
+            width: 100%;
+            position: relative;
         }
         
         /* SIDEBAR - Fixed/sticky on desktop */
@@ -47,21 +57,112 @@
             width: 280px;
             background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
             color: white;
-            min-height: 100vh;
-            height: 100%;
+            height: 100vh;
             position: sticky;
             top: 0;
-            align-self: flex-start;
             flex-shrink: 0;
-            transition: all 0.3s ease;
+            overflow-y: auto;
+            z-index: 100;
         }
         
-        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid #374151; }
-        .sidebar-header .logo {
-            display: flex; align-items: center; gap: 0.75rem;
-            color: white; text-decoration: none; font-weight: 600; font-size: 1.125rem;
+        .admin-sidebar::-webkit-scrollbar {
+            width: 4px;
         }
-        .sidebar-header .logo i { color: #10b981; }
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: #374151;
+        }
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+        
+        /* Mobile: Sidebar becomes hidden off-canvas */
+        @media (max-width: 768px) {
+            .app-wrapper {
+                position: relative;
+            }
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                width: 280px;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease;
+            }
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                z-index: 1001;
+                background: #10b981;
+                color: white;
+                border: none;
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            .admin-main {
+                padding-top: 70px !important;
+                width: 100%;
+                overflow-x: hidden;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+        }
+        
+        .sidebar-header { 
+            padding: 1.5rem; 
+            border-bottom: 1px solid #374151; 
+        }
+        .sidebar-header .logo {
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem;
+            color: white; 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 1.125rem;
+        }
+        .sidebar-header .logo i { 
+            color: #10b981; 
+        }
         
         .user-info { 
             padding: 1.5rem; 
@@ -110,7 +211,9 @@
             display: inline-block;
         }
         
-        .sidebar-nav { padding: 1rem 0; }
+        .sidebar-nav { 
+            padding: 1rem 0; 
+        }
         .sidebar-nav a {
             display: flex;
             align-items: center;
@@ -139,25 +242,49 @@
             line-height: 1.2;
             box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .sidebar-nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-nav a:hover { 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+        }
         .sidebar-nav a.active {
-            background: rgba(16,185,129,0.2); color: #10b981;
+            background: rgba(16,185,129,0.2); 
+            color: #10b981;
             border-left: 4px solid #10b981;
         }
-        .sidebar-nav a i { width: 20px; text-align: center; }
+        .sidebar-nav a i { 
+            width: 20px; 
+            text-align: center; 
+        }
         .sidebar-footer {
-            padding: 1rem 1.5rem; border-top: 1px solid #374151;
-            display: flex; flex-direction: column; gap: 0.5rem;
+            padding: 1rem 1.5rem; 
+            border-top: 1px solid #374151;
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.5rem;
+            margin-top: auto;
         }
         .sidebar-link {
-            display: flex; align-items: center; gap: 0.75rem; color: #d1d5db;
-            text-decoration: none; padding: 0.5rem; border-radius: 0.375rem;
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            color: #d1d5db;
+            text-decoration: none; 
+            padding: 0.5rem; 
+            border-radius: 0.375rem;
             transition: background 0.2s;
         }
-        .sidebar-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-link:hover { 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+        }
         .logout-btn {
-            display: flex; align-items: center; gap: 0.75rem; color: #d1d5db;
-            text-decoration: none; padding: 0.5rem; border-radius: 0.375rem;
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            color: #d1d5db;
+            text-decoration: none; 
+            padding: 0.5rem; 
+            border-radius: 0.375rem;
             transition: background 0.2s;
             background: none;
             border: none;
@@ -165,7 +292,10 @@
             cursor: pointer;
             font-size: 1rem;
         }
-        .logout-btn:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .logout-btn:hover { 
+            background: rgba(239,68,68,0.2); 
+            color: #ef4444; 
+        }
         
         /* MAIN CONTENT */
         .admin-main {
@@ -175,129 +305,107 @@
             min-height: 100vh;
             width: 100%;
             overflow-x: auto;
-            transition: padding 0.3s ease;
         }
         
-        /* RESPONSIVE - Mobile/Tablet: Sidebar becomes top bar */
-        @media (max-width: 992px) {
-            .admin-sidebar {
-                width: 240px;
-            }
-        }
-        
+        /* Responsive breakpoints */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            .admin-sidebar {
-                width: 100%;
-                min-height: auto;
-                position: relative;
-                top: 0;
-                position: static;
-                flex-shrink: 0;
-            }
-            .sidebar-header {
-                padding: 1rem;
-            }
-            .user-info {
-                padding: 1rem;
-            }
-            .user-info .user-logo img {
-                height: 40px;
-            }
-            .avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-            .sidebar-nav {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                padding: 0.5rem;
-                gap: 0.25rem;
-            }
-            .sidebar-nav a {
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                margin: 0.25rem;
-                width: auto;
-            }
-            .sidebar-nav a.active {
-                border-left: none;
-                border-bottom: 2px solid #10b981;
-            }
-            .sidebar-footer {
-                flex-direction: row;
-                justify-content: center;
-                gap: 1rem;
-                padding: 0.75rem;
-            }
-            .sidebar-footer .sidebar-link, 
-            .sidebar-footer .logout-btn {
-                width: auto;
-                padding: 0.5rem 1rem;
-            }
             .admin-main {
                 padding: 1rem;
-                overflow-x: visible;
+                padding-top: 70px;
+            }
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
             .page-header h1 {
                 font-size: 1.5rem;
             }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .analytics-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .health-metrics {
-                grid-template-columns: 1fr;
-            }
             .header-actions {
-                flex-direction: column;
                 width: 100%;
+                flex-direction: column;
             }
             .btn-refresh, .btn-analytics {
                 width: 100%;
                 text-align: center;
                 justify-content: center;
             }
-        }
-        
-        @media (max-width: 480px) {
-            .sidebar-nav a {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.8rem;
-            }
-            .sidebar-nav a .badge {
-                font-size: 0.6rem;
-                padding: 0.15rem 0.4rem;
-            }
-            .user-info .user-logo img {
-                height: 35px;
-            }
-            .avatar {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
-            .admin-main {
-                padding: 0.75rem;
+            .form-grid {
+                grid-template-columns: 1fr !important;
             }
             .analytics-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.75rem;
             }
-            .analytics-card .value {
-                font-size: 1.2rem;
+            .health-metrics {
+                grid-template-columns: 1fr !important;
+                gap: 1rem;
             }
             .filter-bar {
                 flex-direction: column;
+                align-items: stretch;
             }
             .clear-log-btn {
-                margin-left: 0;
+                margin-left: 0 !important;
                 width: 100%;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .section-title {
+                font-size: 1.1rem;
+                flex-wrap: wrap;
+            }
+            .log-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .log-table {
+                min-width: 600px;
+            }
+            .metric-value {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .analytics-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .admin-main {
+                padding: 0.75rem;
+                padding-top: 70px;
+            }
+            .card {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            .section-title {
+                margin: 1rem 0 0.75rem;
+                font-size: 1rem;
+            }
+            .form-group input, .form-group select {
+                padding: 0.6rem;
+                font-size: 0.8rem;
+            }
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+            .analytics-card .value {
+                font-size: 1.1rem;
+            }
+            .log-table th, .log-table td {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .analytics-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .admin-main {
+                padding: 1.5rem;
             }
         }
         
@@ -349,7 +457,7 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: #1f2937;
-            margin: 2rem 0 1rem;
+            margin: 1.5rem 0 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -361,10 +469,10 @@
         .card {
             background: white;
             border-radius: 1rem;
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s;
         }
         .card:hover {
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -463,6 +571,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             z-index: 9999;
             animation: slideIn 0.3s ease;
+            max-width: calc(100% - 40px);
         }
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
@@ -533,6 +642,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             color: #1f2937;
+            word-break: break-word;
         }
         .analytics-card .trend {
             font-size: 0.7rem;
@@ -541,43 +651,91 @@
         .trend-up { color: #10b981; }
         .trend-down { color: #ef4444; }
         
-        /* System Log Table */
+        /* System Log Table - IMPROVED RESPONSIVENESS */
         .log-table-container {
+            width: 100%;
             overflow-x: auto;
-            max-height: 400px;
             overflow-y: auto;
+            max-height: 450px;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 0.75rem;
         }
+        
         .log-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
+            font-size: 0.875rem;
         }
-        .log-table th {
-            text-align: left;
+        
+        /* Make table responsive - allow minimum width but wrap on small screens */
+        .log-table th,
+        .log-table td {
             padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        
+        .log-table th {
             background: #f9fafb;
             font-weight: 600;
             color: #374151;
-            border-bottom: 1px solid #e5e7eb;
             position: sticky;
             top: 0;
-            background: #f9fafb;
+            z-index: 10;
+            white-space: nowrap;
         }
+        
         .log-table td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e5e7eb;
             color: #4b5563;
-            font-size: 0.875rem;
+            word-break: break-word;
+            white-space: normal;
         }
+        
+        /* Ensure message column wraps properly */
+        .log-table td:last-child {
+            word-break: break-word;
+            white-space: normal;
+            min-width: 150px;
+            max-width: 300px;
+        }
+        
         .log-table tr:hover {
             background: #f9fafb;
         }
+        
+        /* Responsive table adjustments */
+        @media (max-width: 768px) {
+            .log-table th,
+            .log-table td {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .log-table td:last-child {
+                max-width: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .log-table th,
+            .log-table td {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.7rem;
+            }
+            
+            .log-table td:last-child {
+                max-width: 150px;
+            }
+        }
+        
         .log-level {
             display: inline-block;
             padding: 0.2rem 0.5rem;
             border-radius: 9999px;
             font-size: 0.7rem;
             font-weight: 600;
+            white-space: nowrap;
         }
         .log-level-info { background: #dbeafe; color: #1e40af; }
         .log-level-warning { background: #fef3c7; color: #92400e; }
@@ -596,9 +754,11 @@
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             font-size: 0.875rem;
+            flex: 1;
+            min-width: 120px;
+            background: white;
         }
         .clear-log-btn {
-            margin-left: auto;
             padding: 0.5rem 1rem;
             background: #ef4444;
             color: white;
@@ -606,6 +766,7 @@
             border-radius: 0.5rem;
             cursor: pointer;
             font-size: 0.75rem;
+            transition: background 0.2s;
         }
         .clear-log-btn:hover {
             background: #dc2626;
@@ -623,255 +784,316 @@
         .view-all-link:hover {
             text-decoration: underline;
         }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
-    <!-- Sidebar - Sticky on desktop, top bar on mobile -->
-    <div class="admin-sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="logo">
-                <i class="fas fa-seedling"></i>
-                <span>Admin Panel</span>
-            </a>
-        </div>
-        
-        <div class="user-info">
-            <div class="user-logo">
-                <img src="/farmer/Logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="avatar" style="display: none;">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-            </div>
-            <div class="user-details">
-                <h4 id="admin-name">Admin</h4>
-                <span class="badge-admin">ADMIN</span>
-            </div>
-        </div>
-        
-        <nav class="sidebar-nav">
-            <a href="/admin/dashboard.html">
-                <div class="nav-left"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></div>
-            </a>
-            <a href="/admin/users.html">
-                <div class="nav-left"><i class="fas fa-users"></i> <span>Users</span></div>
-                <span class="badge" id="pending-users">0</span>
-            </a>
-            <a href="/admin/farmers.html">
-                <div class="nav-left"><i class="fas fa-tractor"></i> <span>Farmers</span></div>
-                <span class="badge" id="pending-verifications">0</span>
-            </a>
-            <a href="/admin/products.html">
-                <div class="nav-left"><i class="fas fa-apple-alt"></i> <span>Products</span></div>
-                <span class="badge" id="pending-reviews">0</span>
-            </a>
-            <a href="/admin/orders.html">
-                <div class="nav-left"><i class="fas fa-shopping-cart"></i> <span>Orders</span></div>
-                <span class="badge" id="orders-count">0</span>
-            </a>
-            <a href="/admin/analytics.html">
-                <div class="nav-left"><i class="fas fa-chart-line"></i> <span>Analytics</span></div>
-            </a>
-            <a href="/admin/settings.html" class="active">
-                <div class="nav-left"><i class="fas fa-cog"></i> <span>Settings</span></div>
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="/" class="sidebar-link"><i class="fas fa-home"></i> <span>Visit Site</span></a>
-            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
-        </div>
-    </div>
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Main Content -->
-    <div class="admin-main">
-        <div class="page-header">
-            <h1><i class="fas fa-cog" style="color: #10b981; margin-right: 0.5rem;"></i> System Settings</h1>
-            <div class="header-actions">
-                <a href="/admin/analytics.html" class="btn-analytics">
-                    <i class="fas fa-chart-line"></i> Full Analytics Dashboard
+    <div class="app-wrapper">
+        <!-- Sidebar - FIXED POSITION -->
+        <div class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <span>Admin Panel</span>
                 </a>
-                <button class="btn-refresh" onclick="refreshAllData()">
-                    <i class="fas fa-sync-alt"></i> Refresh All
-                </button>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-logo">
+                    <img src="/farmer/Logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="avatar" style="display: none;">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                </div>
+                <div class="user-details">
+                    <h4 id="admin-name">Admin</h4>
+                    <span class="badge-admin">ADMIN</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html">
+                    <div class="nav-left"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></div>
+                </a>
+                <a href="/admin/users.html">
+                    <div class="nav-left"><i class="fas fa-users"></i> <span>Users</span></div>
+                    <span class="badge" id="pending-users">0</span>
+                </a>
+                <a href="/admin/farmers.html">
+                    <div class="nav-left"><i class="fas fa-tractor"></i> <span>Farmers</span></div>
+                    <span class="badge" id="pending-verifications">0</span>
+                </a>
+                <a href="/admin/products.html">
+                    <div class="nav-left"><i class="fas fa-apple-alt"></i> <span>Products</span></div>
+                    <span class="badge" id="pending-reviews">0</span>
+                </a>
+                <a href="/admin/orders.html">
+                    <div class="nav-left"><i class="fas fa-shopping-cart"></i> <span>Orders</span></div>
+                    <span class="badge" id="orders-count">0</span>
+                </a>
+                <a href="/admin/analytics.html">
+                    <div class="nav-left"><i class="fas fa-chart-line"></i> <span>Analytics</span></div>
+                </a>
+                <a href="/admin/settings.html" class="active">
+                    <div class="nav-left"><i class="fas fa-cog"></i> <span>Settings</span></div>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/" class="sidebar-link"><i class="fas fa-home"></i> <span>Visit Site</span></a>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
             </div>
         </div>
 
-        <!-- System Status -->
-        <div class="section-title">
-            <i class="fas fa-heartbeat"></i> System Status
-        </div>
-        <div class="card">
-            <div class="health-metrics">
-                <div class="metric">
-                    <span class="metric-label">API Status</span>
-                    <div class="metric-value"><span class="status-dot" style="background: #10b981;"></span> Online</div>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Database</span>
-                    <div class="metric-value"><span class="status-dot" style="background: #10b981;"></span> Connected</div>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Platform Status</span>
-                    <div class="metric-value" id="platform-status-display"><span class="status-dot" style="background: #10b981;"></span> Operational</div>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Admin Contact</span>
-                    <div class="metric-value" id="admin-contact-display">admin@digitalfarmers.com</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Analytics Overview Section -->
-        <div class="section-title">
-            <i class="fas fa-chart-pie"></i> Analytics Overview
-            <a href="/admin/analytics.html" class="view-all-link" style="margin-left: auto;">
-                View Detailed Analytics <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-        <div class="card">
-            <div class="analytics-grid" id="analytics-cards">
-                <div class="analytics-card">
-                    <h4><i class="fas fa-users"></i> Total Users</h4>
-                    <div class="value" id="analytics-total-users">-</div>
-                    <div class="trend trend-up" id="user-trend">Loading...</div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-tractor"></i> Farmers</h4>
-                    <div class="value" id="analytics-total-farmers">-</div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-shopping-cart"></i> Total Orders</h4>
-                    <div class="value" id="analytics-total-orders">-</div>
-                    <div class="trend trend-up" id="order-trend">Loading...</div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-money-bill-wave"></i> Total Revenue</h4>
-                    <div class="value" id="analytics-total-revenue">-</div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-box-open"></i> Products</h4>
-                    <div class="value" id="analytics-total-products">-</div>
-                    <div class="trend" id="product-trend"></div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-clock"></i> Pending Actions</h4>
-                    <div class="value" id="analytics-pending-actions">-</div>
-                    <div class="trend trend-warning" id="pending-trend"></div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-check-circle"></i> Completed Orders</h4>
-                    <div class="value" id="analytics-completed-orders">-</div>
-                </div>
-                <div class="analytics-card">
-                    <h4><i class="fas fa-hourglass-half"></i> Pending Orders</h4>
-                    <div class="value" id="analytics-pending-orders">-</div>
-                </div>
-            </div>
-            <div style="margin-top: 1rem; text-align: right;">
-                <p style="font-size: 0.75rem; color: #6b7280;">
-                    <i class="fas fa-info-circle"></i> Real-time analytics from platform data. 
-                    <span id="last-updated"></span>
-                </p>
-            </div>
-        </div>
-
-        <!-- Platform Configuration -->
-        <div class="section-title">
-            <i class="fas fa-sliders-h"></i> Platform Configuration
-        </div>
-        <div class="card">
-            <form id="settings-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="platform_name">
-                            <i class="fas fa-store" style="margin-right: 0.5rem; color: #10b981;"></i>
-                            Platform Name
-                        </label>
-                        <input type="text" id="platform_name" name="platform_name" 
-                               placeholder="e.g., Digital Farmers Market">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="support_email">
-                            <i class="fas fa-envelope" style="margin-right: 0.5rem; color: #10b981;"></i>
-                            Support Email
-                        </label>
-                        <input type="email" id="support_email" name="support_email" 
-                               placeholder="digitalfarmermsmarket@gmail.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="support_phone">
-                            <i class="fas fa-phone" style="margin-right: 0.5rem; color: #10b981;"></i>
-                            Support Phone
-                        </label>
-                        <input type="tel" id="support_phone" name="support_phone" 
-                               placeholder="e.g., 09123456789">
-                    </div>
-                </div>
-
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="maintenance_mode" name="maintenance_mode">
-                        <label for="maintenance_mode">
-                            <i class="fas fa-tools" style="margin-right: 0.5rem; color: #10b981;"></i>
-                            Maintenance Mode
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save Settings
-                    </button>
-                    <button type="button" class="btn btn-outline" onclick="loadSettings()">
-                        <i class="fas fa-sync-alt"></i> Refresh
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-cog" style="color: #10b981; margin-right: 0.5rem;"></i> System Settings</h1>
+                <div class="header-actions">
+                    <a href="/admin/analytics.html" class="btn-analytics">
+                        <i class="fas fa-chart-line"></i> Full Analytics Dashboard
+                    </a>
+                    <button class="btn-refresh" onclick="refreshAllData()">
+                        <i class="fas fa-sync-alt"></i> Refresh All
                     </button>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <!-- System Log Section -->
-        <div class="section-title">
-            <i class="fas fa-history"></i> System Log
-            <span style="font-size: 0.75rem; font-weight: normal; margin-left: 1rem; color: #6b7280;">User Activity & System Performance</span>
-        </div>
-        <div class="card">
-            <div class="filter-bar">
-                <select id="log-level-filter" class="filter-select" onchange="filterLogs()">
-                    <option value="all">All Levels</option>
-                    <option value="info">Info</option>
-                    <option value="success">Success</option>
-                    <option value="warning">Warning</option>
-                    <option value="error">Error</option>
-                </select>
-                <select id="log-type-filter" class="filter-select" onchange="filterLogs()">
-                    <option value="all">All Types</option>
-                    <option value="user">User Activity</option>
-                    <option value="order">Order Activity</option>
-                    <option value="product">Product Activity</option>
-                    <option value="system">System</option>
-                </select>
-                <button class="clear-log-btn" onclick="clearSystemLogs()">
-                    <i class="fas fa-trash-alt"></i> Clear Logs
-                </button>
+            <!-- System Status -->
+            <div class="section-title">
+                <i class="fas fa-heartbeat"></i> System Status
             </div>
-            <div class="log-table-container" id="log-container">
-                <div class="loading-spinner">Loading system logs...</div>
+            <div class="card">
+                <div class="health-metrics">
+                    <div class="metric">
+                        <span class="metric-label">API Status</span>
+                        <div class="metric-value"><span class="status-dot" style="background: #10b981;"></span> Online</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Database</span>
+                        <div class="metric-value"><span class="status-dot" style="background: #10b981;"></span> Connected</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Platform Status</span>
+                        <div class="metric-value" id="platform-status-display"><span class="status-dot" style="background: #10b981;"></span> Operational</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Admin Contact</span>
+                        <div class="metric-value" id="admin-contact-display">admin@digitalfarmers.com</div>
+                    </div>
+                </div>
             </div>
-            <div style="margin-top: 1rem; text-align: right;">
-                <small style="color: #6b7280;">
-                    <i class="fas fa-clock"></i> Showing recent system events
-                </small>
+
+            <!-- Analytics Overview -->
+            <div class="section-title">
+                <i class="fas fa-chart-pie"></i> Analytics Overview
+                <a href="/admin/analytics.html" class="view-all-link" style="margin-left: auto;">
+                    View Detailed Analytics <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card">
+                <div class="analytics-grid" id="analytics-cards">
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-users"></i> Total Users</h4>
+                        <div class="value" id="analytics-total-users">-</div>
+                        <div class="trend trend-up" id="user-trend">Loading...</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-tractor"></i> Farmers</h4>
+                        <div class="value" id="analytics-total-farmers">-</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-shopping-cart"></i> Total Orders</h4>
+                        <div class="value" id="analytics-total-orders">-</div>
+                        <div class="trend trend-up" id="order-trend">Loading...</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-money-bill-wave"></i> Total Revenue</h4>
+                        <div class="value" id="analytics-total-revenue">-</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-box-open"></i> Products</h4>
+                        <div class="value" id="analytics-total-products">-</div>
+                        <div class="trend" id="product-trend"></div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-clock"></i> Pending Actions</h4>
+                        <div class="value" id="analytics-pending-actions">-</div>
+                        <div class="trend trend-warning" id="pending-trend"></div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-check-circle"></i> Completed Orders</h4>
+                        <div class="value" id="analytics-completed-orders">-</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4><i class="fas fa-hourglass-half"></i> Pending Orders</h4>
+                        <div class="value" id="analytics-pending-orders">-</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; text-align: right;">
+                    <p style="font-size: 0.75rem; color: #6b7280;">
+                        <i class="fas fa-info-circle"></i> Real-time analytics from platform data. 
+                        <span id="last-updated"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Platform Configuration -->
+            <div class="section-title">
+                <i class="fas fa-sliders-h"></i> Platform Configuration
+            </div>
+            <div class="card">
+                <form id="settings-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="platform_name">
+                                <i class="fas fa-store" style="margin-right: 0.5rem; color: #10b981;"></i>
+                                Platform Name
+                            </label>
+                            <input type="text" id="platform_name" name="platform_name" 
+                                   placeholder="e.g., Digital Farmers Market">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="support_email">
+                                <i class="fas fa-envelope" style="margin-right: 0.5rem; color: #10b981;"></i>
+                                Support Email
+                            </label>
+                            <input type="email" id="support_email" name="support_email" 
+                                   placeholder="digitalfarmermsmarket@gmail.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="support_phone">
+                                <i class="fas fa-phone" style="margin-right: 0.5rem; color: #10b981;"></i>
+                                Support Phone
+                            </label>
+                            <input type="tel" id="support_phone" name="support_phone" 
+                                   placeholder="e.g., 09123456789">
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="maintenance_mode" name="maintenance_mode">
+                            <label for="maintenance_mode">
+                                <i class="fas fa-tools" style="margin-right: 0.5rem; color: #10b981;"></i>
+                                Maintenance Mode
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="loadSettings()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- System Log Section -->
+            <div class="section-title">
+                <i class="fas fa-history"></i> System Log
+                <span style="font-size: 0.75rem; font-weight: normal; margin-left: 1rem; color: #6b7280;">User Activity & System Performance</span>
+            </div>
+            <div class="card">
+                <div class="filter-bar">
+                    <select id="log-level-filter" class="filter-select" onchange="filterLogs()">
+                        <option value="all">All Levels</option>
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                    </select>
+                    <select id="log-type-filter" class="filter-select" onchange="filterLogs()">
+                        <option value="all">All Types</option>
+                        <option value="user">User Activity</option>
+                        <option value="order">Order Activity</option>
+                        <option value="product">Product Activity</option>
+                        <option value="system">System</option>
+                    </select>
+                    <button class="clear-log-btn" onclick="clearSystemLogs()">
+                        <i class="fas fa-trash-alt"></i> Clear Logs
+                    </button>
+                </div>
+                <div class="log-table-container" id="log-container">
+                    <div class="loading-spinner">Loading system logs...</div>
+                </div>
+                <div style="margin-top: 1rem; text-align: right;">
+                    <small style="color: #6b7280;">
+                        <i class="fas fa-clock"></i> Showing recent system events
+                    </small>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Change this line
         const API_BASE_URL = 'https://digital-farmers-market-backend-1.onrender.com/api';
         let currentLogs = [];
 
-        // Add this at the beginning of your dashboard JS
+        // Mobile sidebar toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const adminSidebar = document.getElementById('adminSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            adminSidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (adminSidebar.classList.contains('open')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        function closeSidebar() {
+            adminSidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', toggleSidebar);
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar on window resize if screen becomes desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && adminSidebar && adminSidebar.classList.contains('open')) {
+                closeSidebar();
+            }
+        });
+
         const originalFetch = window.fetch;
         window.fetch = function(...args) {
             return originalFetch.apply(this, args).then(response => {
@@ -965,7 +1187,6 @@
             }
         }
 
-        // Load settings
         async function loadSettings() {
             if (!checkAuth()) return;
             
@@ -994,14 +1215,9 @@
                 
             } catch (error) {
                 console.error('❌ Failed to load settings:', error);
-                document.getElementById('platform_name').value = 'Digital Farmers Market';
-                document.getElementById('support_email').value = 'support@digitalfarmers.com';
-                document.getElementById('support_phone').value = '09123456789';
-                document.getElementById('maintenance_mode').checked = false;
             }
         }
 
-        // Load analytics data
         async function loadAnalytics() {
             try {
                 const data = await apiRequest('/admin/analytics');
@@ -1044,7 +1260,6 @@
             }
         }
 
-        // Load sidebar badges
         async function loadSidebarBadges() {
             try {
                 const farmersData = await apiRequest('/admin/farmers/pending-verifications');
@@ -1068,7 +1283,6 @@
             }
         }
 
-        // Load System Logs
         async function loadSystemLogs() {
             try {
                 let logs = [];
@@ -1092,7 +1306,7 @@
                 filterLogs();
             } catch (error) {
                 console.error('Error loading system logs:', error);
-                document.getElementById('log-container').innerHTML = '<div class="loading-spinner">Error loading logs. Using sample data.</div>';
+                document.getElementById('log-container').innerHTML = '<div class="empty-state">Error loading logs. Using sample data.</div>';
                 currentLogs = generateSampleLogs();
                 filterLogs();
             }
@@ -1130,7 +1344,7 @@
             const container = document.getElementById('log-container');
             
             if (!logs || logs.length === 0) {
-                container.innerHTML = '<div class="loading-spinner">No logs found</div>';
+                container.innerHTML = '<div class="empty-state">No logs found</div>';
                 return;
             }
             
@@ -1139,15 +1353,21 @@
             const html = `
                 <table class="log-table">
                     <thead>
-                        <tr><th>Time</th><th>Level</th><th>Type</th><th>User</th><th>Message</th></tr>
+                        <tr>
+                            <th>Time</th>
+                            <th>Level</th>
+                            <th>Type</th>
+                            <th>User</th>
+                            <th>Message</th>
+                        </tr>
                     </thead>
                     <tbody>
                         ${logs.slice(0, 100).map(log => `
                             <tr>
-                                <td>${new Date(log.timestamp).toLocaleString()}</td>
+                                <td style="white-space: nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
                                 <td><span class="log-level log-level-${log.level}">${log.level.toUpperCase()}</span></td>
                                 <td>${log.type || 'system'}</td>
-                                <td>${log.user || 'System'}</td>
+                                <td>${escapeHtml(log.user || 'System')}</td>
                                 <td>${escapeHtml(log.message)}</td>
                             </tr>
                         `).join('')}
@@ -1194,7 +1414,6 @@
             return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
         }
 
-        // Save settings
         document.getElementById('settings-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1250,7 +1469,6 @@
             }
         });
 
-        // Refresh all data
         async function refreshAllData() {
             showToast('Refreshing all data...', 'info', 1500);
             await Promise.all([
@@ -1262,7 +1480,6 @@
             showToast('All data refreshed!', 'success');
         }
 
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('token');
@@ -1272,11 +1489,9 @@
             window.location.href = '/admin/login.html';
         });
 
-        // Set admin name
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         document.getElementById('admin-name').textContent = user.full_name || 'Admin';
 
-        // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
             console.log('📄 Settings page loaded');
             

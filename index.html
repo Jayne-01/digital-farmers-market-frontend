@@ -59,16 +59,40 @@
         .how-it-works .section-title {
             color: #000000 !important;
         }
+
+        /* ===== FIX 1: Sign Up button text stays on one line ===== */
+        .btn-primary,
+        .btn-outline,
+        .btn-secondary,
+        .btn {
+            white-space: nowrap !important;
+        }
+
+        /* ===== FIX 2: Remove extra space before the logo ===== */
+        .logo {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* ===== FIX 3: Add space between Digital Farmers Market text and Features link ===== */
+        .logo {
+            margin-right: 30px !important;
+        }
+        
+        .navbar .container {
+            padding-left: 24px;
+            padding-right: 24px;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation - ORIGINAL colors from your CSS files (unchanged) -->
     <nav class="navbar">
         <div class="container">
-           <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+           <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none; margin: 0; padding: 0; margin-right: 30px;">
                 <img src="farmer/Logo.png" alt="Logo" style="height: 100px; width: auto; border-radius: 8px;">
                 <div>
-                    <span style="font-weight: 900; font-size: 2.0rem;">Digital Farmers Market</span>
+                    <span style="font-weight: 900; font-size: 1.70rem;">Digital Farmers Market</span>
                 </div>
            </a>
             

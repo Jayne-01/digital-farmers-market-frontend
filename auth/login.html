@@ -2,40 +2,304 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Login - Digital Farmers Market</title>
     <link rel="icon" type="image/png" href="/Logo.png">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/components.css">
-    <link rel="stylesheet" href="/auth/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e9f5e9 0%, #cde3cd 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .auth-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            margin-bottom: 24px;
+        }
+        
+        .logo img {
+            height: 60px;
+            width: auto;
+            border-radius: 8px;
+        }
+        
+        .logo span {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1f2937;
+        }
+        
+        .auth-header h2 {
+            font-size: 1.75rem;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .auth-header p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .auth-form {
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .form-group label i {
+            color: #10b981;
+            width: 20px;
+            margin-right: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        
+        .form-group input.error-input {
+            border-color: #dc2626;
+            background-color: #fef2f2;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 24px;
+        }
+        
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .checkbox input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary.loading {
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .auth-divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 60px);
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .auth-divider::before {
+            left: 0;
+        }
+        
+        .auth-divider::after {
+            right: 0;
+        }
+        
+        .auth-divider span {
+            background: white;
+            padding: 0 16px;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+        
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+        }
+        
+        .btn-google:hover {
+            background: #f9fafb;
+            border-color: #10b981;
+            transform: translateY(-1px);
+        }
+        
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .auth-footer p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+        
+        .auth-footer a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 0.8rem;
+        }
+        
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
             color: white;
             font-weight: 500;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             z-index: 9999;
-            animation: slideIn 0.2s ease;
+            animation: slideIn 0.3s ease;
+            max-width: calc(100% - 40px);
         }
-        .toast.success { background: #2E7D32; }
-        .toast.error { background: #dc2626; }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
         .toast.info { background: #3b82f6; }
+        
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        
         .fade-out {
-            animation: fadeOut 0.2s ease forwards;
+            animation: fadeOut 0.3s ease forwards;
         }
+        
         @keyframes fadeOut {
             to { opacity: 0; transform: translateX(100%); }
         }
+        
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -46,8 +310,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9998;
+            z-index: 10000;
         }
+        
         .loading-spinner {
             width: 50px;
             height: 50px;
@@ -56,82 +321,49 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-        
-        .btn-primary {
-            position: relative;
-            transition: all 0.2s ease;
-        }
-        .btn-primary:active {
-            transform: scale(0.97);
-        }
-        .btn-primary.loading {
-            pointer-events: none;
-            opacity: 0.8;
-        }
-        .btn-primary.loading i.fa-spinner {
-            animation: spin 0.8s linear infinite;
-        }
-        
-        .form-group input {
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-        .form-group input.error-input {
-            border-color: #dc2626;
-            background-color: #fef2f2;
-        }
-        
-        .maintenance-badge {
-            background: #fef3c7;
-            color: #92400e;
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            margin-top: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .maintenance-message {
             background: #fef3c7;
             padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             color: #92400e;
             text-align: center;
-            font-size: 14px;
+            font-size: 0.875rem;
         }
         
-        body.redirecting {
-            opacity: 0.95;
-            transition: opacity 0.2s ease;
-        }
-        
-        @keyframes btn-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
         .fa-spinner {
-            animation: btn-spin 0.7s linear infinite;
+            animation: spin 0.7s linear infinite;
+        }
+        
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 32px 20px;
+            }
+            .logo img {
+                height: 50px;
+            }
+            .auth-header h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loadingOverlay" class="loading-overlay">
+    <div id="loadingOverlay" class="loading-overlay" style="display: flex;">
         <div class="loading-spinner"></div>
     </div>
 
     <div class="auth-container" id="authContainer" style="display: none;">
         <div class="auth-card">
             <div class="auth-header">
-                <a href="/farmer/dashboard.html" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-                    <img src="/farmer/Logo.png" alt="Logo" style="height: 80px; width: auto; border-radius: 8px;">
-                    <div>
-                        <span style="font-weight: 600; font-size: 1.1rem;">Digital Farmers Market</span>
-                    </div>
+                <a href="/farmer/dashboard.html" class="logo">
+                    <img src="/farmer/Logo.png" alt="Logo" onerror="this.src='/Logo.png'">
+                    <span>Digital Farmers Market</span>
                 </a>
                 <h2>Welcome Back</h2>
                 <p>Login to access your account</p>
@@ -159,7 +391,7 @@
                     </label>
                 </div>
                 
-                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                <button type="submit" class="btn btn-primary" id="loginBtn">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
             </form>
@@ -169,7 +401,7 @@
             </div>
             
             <button type="button" id="googleSignInBtn" class="btn-google">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 20px; height: 20px;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Sign in with Google
             </button>
             
@@ -183,7 +415,7 @@
     </div>
     
     <script>
-        // ==================== LOGIN FUNCTIONALITY ====================
+        // ==================== FIXED: DEPLOYED BACKEND URL ====================
         const BACKEND_URL = 'https://digital-farmers-market-backend-1.onrender.com';
         
         // DOM Elements
@@ -213,7 +445,7 @@
             toastTimer = setTimeout(() => {
                 if (toast) {
                     toast.classList.add('fade-out');
-                    setTimeout(() => toast.remove(), 200);
+                    setTimeout(() => toast.remove(), 300);
                 }
                 toastTimer = null;
             }, duration);
@@ -294,10 +526,14 @@
             return isValid ? { email, password, isValid: true } : { isValid: false };
         }
         
-        // Check if maintenance mode is ON before trying to login
         async function checkMaintenanceMode() {
             try {
-                const response = await fetch(`${BACKEND_URL}/api/maintenance-status`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                const response = await fetch(`${BACKEND_URL}/api/maintenance-status`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
                 const data = await response.json();
                 return data.maintenance_mode === true;
             } catch (error) {
@@ -306,17 +542,20 @@
             }
         }
         
-        // Try admin login first, then customer login
         async function tryAdminLogin(email, password) {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
                 const response = await fetch(`${BACKEND_URL}/api/auth/admin/login`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password }),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
                 
                 const data = await response.json();
                 
@@ -331,18 +570,21 @@
         
         async function tryCustomerLogin(email, password) {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
                 const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password }),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
                 
                 const data = await response.json();
                 
-                // Check if maintenance mode is blocking the login
                 if (response.status === 503 && data.maintenance === true) {
                     return { success: false, maintenance: true, message: data.message };
                 }
@@ -357,14 +599,11 @@
         }
         
         async function handleLogin(email, password, remember) {
-            // First check if maintenance mode is ON (for non-admin users)
             const isMaintenanceOn = await checkMaintenanceMode();
             
-            // First try admin login (admin can login even during maintenance)
             let loginResult = await tryAdminLogin(email, password);
             
             if (loginResult.success) {
-                // Admin login successful
                 const data = loginResult.data;
                 
                 localStorage.setItem('token', data.token);
@@ -376,25 +615,23 @@
                     localStorage.removeItem('remembered_email');
                 }
                 
-                showToast('Login successful! Redirecting...', 'success', 1000);
+                showToast('Login successful! Redirecting...', 'success', 800);
                 
                 setTimeout(() => {
                     window.location.href = '/admin/dashboard.html';
-                }, 800);
+                }, 500);
                 
                 return { success: true };
             }
             
-            // If maintenance is ON and not admin, redirect to maintenance page
             if (isMaintenanceOn) {
                 showToast('System is under maintenance. Please try again later.', 'error', 3000);
                 setTimeout(() => {
                     window.location.href = '/maintenance.html';
-                }, 2500);
+                }, 2000);
                 return { success: false, maintenance: true };
             }
             
-            // Try customer login
             loginResult = await tryCustomerLogin(email, password);
             
             if (loginResult.success) {
@@ -409,7 +646,7 @@
                     localStorage.removeItem('remembered_email');
                 }
                 
-                showToast('Login successful! Redirecting...', 'success', 1000);
+                showToast('Login successful! Redirecting...', 'success', 800);
                 
                 const role = data.user.role;
                 let redirectUrl = '/customer/marketplace.html';
@@ -417,22 +654,20 @@
                 
                 setTimeout(() => {
                     window.location.href = redirectUrl;
-                }, 800);
+                }, 500);
                 
                 return { success: true };
             } else if (loginResult.maintenance) {
-                // Maintenance mode blocking customer login
                 showToast(loginResult.message || 'System is under maintenance. Please try again later.', 'error', 3000);
                 setTimeout(() => {
                     window.location.href = '/maintenance.html';
-                }, 2500);
+                }, 2000);
                 return { success: false, maintenance: true };
             } else {
                 throw new Error('Invalid email or password');
             }
         }
         
-        // Event Handlers
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -470,32 +705,24 @@
         }
         
         if (emailInput) {
-            emailInput.addEventListener('focus', () => {
-                emailInput.classList.remove('error-input');
-            });
-            emailInput.addEventListener('input', () => {
-                emailInput.classList.remove('error-input');
-            });
+            emailInput.addEventListener('focus', () => emailInput.classList.remove('error-input'));
+            emailInput.addEventListener('input', () => emailInput.classList.remove('error-input'));
         }
         
         if (passwordInput) {
-            passwordInput.addEventListener('focus', () => {
-                passwordInput.classList.remove('error-input');
-            });
-            passwordInput.addEventListener('input', () => {
-                passwordInput.classList.remove('error-input');
-            });
+            passwordInput.addEventListener('focus', () => passwordInput.classList.remove('error-input'));
+            passwordInput.addEventListener('input', () => passwordInput.classList.remove('error-input'));
         }
         
+        // FIXED: Google Sign In with correct deployed backend URL
         if (googleBtn) {
             googleBtn.addEventListener('click', async () => {
-                // Check maintenance mode first
                 const isMaintenanceOn = await checkMaintenanceMode();
                 if (isMaintenanceOn) {
                     showToast('Google login is disabled during maintenance', 'error');
                     setTimeout(() => {
                         window.location.href = '/maintenance.html';
-                    }, 2000);
+                    }, 1500);
                     return;
                 }
                 
@@ -503,21 +730,28 @@
                     localStorage.setItem('remembered_email', emailInput.value.trim());
                 }
                 
-                const originalGoogleContent = googleBtn.innerHTML;
+                // SAVE ORIGINAL CONTENT
+                const originalContent = googleBtn.innerHTML;
                 googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
                 googleBtn.disabled = true;
                 
-                window.location.href = `${BACKEND_URL}/api/auth/google`;
+                // FIXED: Use deployed backend URL, NOT localhost
+                // Add a small delay to ensure the button state is shown
+                setTimeout(() => {
+                    window.location.href = `${BACKEND_URL}/api/auth/google`;
+                }, 100);
                 
+                // Fallback: re-enable button after 5 seconds if redirect doesn't happen
                 setTimeout(() => {
                     if (googleBtn && googleBtn.disabled) {
-                        googleBtn.innerHTML = originalGoogleContent;
+                        googleBtn.innerHTML = originalContent;
                         googleBtn.disabled = false;
                     }
-                }, 3000);
+                }, 5000);
             });
         }
         
+        // Prefetch for faster navigation
         if ('requestIdleCallback' in window) {
             requestIdleCallback(() => {
                 const prefetchUrls = ['/admin/dashboard.html', '/farmer/dashboard.html', '/customer/marketplace.html'];
@@ -531,6 +765,7 @@
             });
         }
         
+        // Keyboard shortcut: Ctrl+Enter to submit
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
@@ -544,19 +779,44 @@
             if (toastTimer) clearTimeout(toastTimer);
         });
         
-        // Initialize page - Show UI
+        // Initialize page - Faster loading
         (async function init() {
-            if (loadingOverlay) loadingOverlay.style.display = 'none';
-            if (authContainer) authContainer.style.display = 'block';
+            // Hide loading overlay immediately
+            if (loadingOverlay) {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 200);
+            }
             
+            // Show auth container
+            if (authContainer) {
+                authContainer.style.display = 'block';
+                authContainer.style.opacity = '0';
+                authContainer.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    if (authContainer) {
+                        authContainer.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        authContainer.style.opacity = '1';
+                        authContainer.style.transform = 'translateY(0)';
+                    }
+                }, 50);
+            }
+            
+            // Load remembered email
             try {
                 const rememberedEmail = localStorage.getItem('remembered_email');
                 if (rememberedEmail && emailInput) {
                     emailInput.value = rememberedEmail;
                     if (rememberCheckbox) rememberCheckbox.checked = true;
+                    // Auto-focus password if email is remembered
+                    if (passwordInput) passwordInput.focus();
+                } else if (emailInput) {
+                    emailInput.focus();
                 }
             } catch (e) { }
             
+            // Log load time
             if (performance && performance.timing) {
                 const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
                 console.log(`✅ Login page loaded in ${loadTime}ms`);

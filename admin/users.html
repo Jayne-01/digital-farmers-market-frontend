@@ -6,7 +6,6 @@
     <title>User Management - Digital Farmers Market</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/png" href="/Logo.png">
-    <script src="/js/api.js"></script>
     <script>
         if (typeof API === 'undefined') {
             console.warn('⚠️ /js/api.js not loaded – using inline fallback.');
@@ -27,11 +26,20 @@
     </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: #f9fafb; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Main layout wrapper */
+        .app-wrapper {
             display: flex;
             min-height: 100vh;
+            width: 100%;
+            position: relative;
         }
         
         /* SIDEBAR - Fixed/sticky on desktop */
@@ -39,12 +47,94 @@
             width: 280px;
             background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
             color: white;
-            min-height: 100vh;
-            height: 100%;
+            height: 100vh;
             position: sticky;
             top: 0;
-            align-self: flex-start;
             flex-shrink: 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: #374151;
+        }
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+        
+        /* Mobile: Sidebar becomes hidden off-canvas */
+        @media (max-width: 768px) {
+            .app-wrapper {
+                position: relative;
+            }
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                width: 280px;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease;
+            }
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                z-index: 1001;
+                background: #10b981;
+                color: white;
+                border: none;
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            .admin-main {
+                padding-top: 70px !important;
+                width: 100%;
+                overflow-x: hidden;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
         }
         
         .sidebar-header { padding: 1.5rem; border-bottom: 1px solid #374151; }
@@ -137,8 +227,12 @@
         }
         .sidebar-nav a i { width: 20px; text-align: center; }
         .sidebar-footer {
-            padding: 1rem 1.5rem; border-top: 1px solid #374151;
-            display: flex; flex-direction: column; gap: 0.5rem;
+            padding: 1rem 1.5rem; 
+            border-top: 1px solid #374151;
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.5rem;
+            margin-top: auto;
         }
         .sidebar-link {
             display: flex; align-items: center; gap: 0.75rem; color: #d1d5db;
@@ -168,70 +262,11 @@
             overflow-x: auto;
         }
         
-        /* RESPONSIVE - Mobile/Tablet: Sidebar becomes top bar */
-        @media (max-width: 992px) {
-            .admin-sidebar {
-                width: 240px;
-            }
-        }
-        
+        /* Responsive breakpoints */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            .admin-sidebar {
-                width: 100%;
-                min-height: auto;
-                position: relative;
-                top: 0;
-                position: static;
-                flex-shrink: 0;
-            }
-            .sidebar-header {
-                padding: 1rem;
-            }
-            .user-info {
-                padding: 1rem;
-            }
-            .user-info .user-logo img {
-                height: 40px;
-            }
-            .avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-            .sidebar-nav {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                padding: 0.5rem;
-                gap: 0.25rem;
-            }
-            .sidebar-nav a {
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                margin: 0.25rem;
-                width: auto;
-            }
-            .sidebar-nav a.active {
-                border-left: none;
-                border-bottom: 2px solid #10b981;
-            }
-            .sidebar-footer {
-                flex-direction: row;
-                justify-content: center;
-                gap: 1rem;
-                padding: 0.75rem;
-            }
-            .sidebar-footer .sidebar-link, 
-            .sidebar-footer .logout-btn {
-                width: auto;
-                padding: 0.5rem 1rem;
-            }
             .admin-main {
                 padding: 1rem;
-                overflow-x: visible;
+                padding-top: 70px;
             }
             .page-header h1 {
                 font-size: 1.5rem;
@@ -239,24 +274,9 @@
         }
         
         @media (max-width: 480px) {
-            .sidebar-nav a {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.8rem;
-            }
-            .sidebar-nav a .badge {
-                font-size: 0.6rem;
-                padding: 0.15rem 0.4rem;
-            }
-            .user-info .user-logo img {
-                height: 35px;
-            }
-            .avatar {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
             .admin-main {
                 padding: 0.75rem;
+                padding-top: 70px;
             }
         }
         
@@ -281,6 +301,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             overflow-x: auto;
             width: 100%;
+            -webkit-overflow-scrolling: touch;
         }
         
         table {
@@ -423,6 +444,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             z-index: 9999;
             animation: slideIn 0.3s ease;
+            max-width: calc(100% - 40px);
         }
         .toast.success { background: #2E7D32; }
         .toast.error { background: #dc2626; }
@@ -438,83 +460,91 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar - Sticky on desktop, top bar on mobile -->
-    <div class="admin-sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="logo">
-                <span>Admin Panel</span>
-            </a>
-        </div>
-        
-        <div class="user-info">
-            <div class="user-logo">
-                <img src="/farmer/Logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="avatar" style="display: none;">
-                    <i class="fas fa-user-shield"></i>
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-wrapper">
+        <!-- Sidebar - Fixed/sticky on desktop -->
+        <div class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <span>Admin Panel</span>
+                </a>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-logo">
+                    <img src="/farmer/Logo.png" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="avatar" style="display: none;">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                </div>
+                <div class="user-details">
+                    <h4 id="admin-name">Admin</h4>
+                    <span class="badge-admin">ADMIN</span>
                 </div>
             </div>
-            <div class="user-details">
-                <h4 id="admin-name">Admin</h4>
-                <span class="badge-admin">ADMIN</span>
+            
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html">
+                    <div class="nav-left"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></div>
+                </a>
+                <a href="/admin/users.html" class="active">
+                    <div class="nav-left"><i class="fas fa-users"></i> <span>Users</span></div>
+                    <span class="badge" id="pending-users-badge">0</span>
+                </a>
+                <a href="/admin/farmers.html">
+                    <div class="nav-left"><i class="fas fa-tractor"></i> <span>Farmers</span></div>
+                    <span class="badge" id="pending-farmers-badge">0</span>
+                </a>
+                <a href="/admin/products.html">
+                    <div class="nav-left"><i class="fas fa-apple-alt"></i> <span>Products</span></div>
+                    <span class="badge" id="pending-products-badge">0</span>
+                </a>
+                <a href="/admin/orders.html">
+                    <div class="nav-left"><i class="fas fa-shopping-cart"></i> <span>Orders</span></div>
+                    <span class="badge" id="orders-badge">0</span>
+                </a>
+                <a href="/admin/analytics.html">
+                    <div class="nav-left"><i class="fas fa-chart-line"></i> <span>Analytics</span></div>
+                </a>
+                <a href="/admin/settings.html">
+                    <div class="nav-left"><i class="fas fa-cog"></i> <span>Settings</span></div>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/" class="sidebar-link"><i class="fas fa-home"></i> <span>Visit Site</span></a>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
             </div>
         </div>
-        
-        <nav class="sidebar-nav">
-            <a href="/admin/dashboard.html">
-                <div class="nav-left"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></div>
-            </a>
-            <a href="/admin/users.html" class="active">
-                <div class="nav-left"><i class="fas fa-users"></i> <span>Users</span></div>
-                <span class="badge" id="pending-users-badge">0</span>
-            </a>
-            <a href="/admin/farmers.html">
-                <div class="nav-left"><i class="fas fa-tractor"></i> <span>Farmers</span></div>
-                <span class="badge" id="pending-farmers-badge">0</span>
-            </a>
-            <a href="/admin/products.html">
-                <div class="nav-left"><i class="fas fa-apple-alt"></i> <span>Products</span></div>
-                <span class="badge" id="pending-products-badge">0</span>
-            </a>
-            <a href="/admin/orders.html">
-                <div class="nav-left"><i class="fas fa-shopping-cart"></i> <span>Orders</span></div>
-                <span class="badge" id="orders-badge">0</span>
-            </a>
-            <a href="/admin/analytics.html">
-                <div class="nav-left"><i class="fas fa-chart-line"></i> <span>Analytics</span></div>
-            </a>
-            <a href="/admin/settings.html">
-                <div class="nav-left"><i class="fas fa-cog"></i> <span>Settings</span></div>
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="/" class="sidebar-link"><i class="fas fa-home"></i> <span>Visit Site</span></a>
-            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
-        </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="admin-main">
-        <div class="page-header">
-            <h1>User Management</h1>
-        </div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
-                        <th>Update Status</th>
-                    </tr>
-                </thead>
-                <tbody id="user-table-body">
-                    <tr><td colspan="8" class="loading">Loading users...</td</tr>
-                </tbody>
-            </table>
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-users" style="color: #10b981; margin-right: 0.5rem;"></i> User Management</h1>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                            <th>Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body">
+                        <tr><td colspan="8" class="loading">Loading users...</td</tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -532,6 +562,48 @@
     </div>
 
     <script>
+        // Mobile sidebar toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const adminSidebar = document.getElementById('adminSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            adminSidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (adminSidebar.classList.contains('open')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        function closeSidebar() {
+            adminSidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', toggleSidebar);
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar on window resize if screen becomes desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && adminSidebar && adminSidebar.classList.contains('open')) {
+                closeSidebar();
+            }
+        });
+
         // Toast notification
         function showToast(message, type = 'success', duration = 5000) {
             const existing = document.querySelectorAll('.toast');
