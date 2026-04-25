@@ -5,7 +5,7 @@
 // =====================================================
 
 (function() {
-    const BACKEND_URL = 'http://localhost:5000';
+    const BACKEND_URL = 'https://digital-farmers-market-backend-1.onrender.com';
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const currentPath = window.location.pathname;

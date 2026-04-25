@@ -305,11 +305,11 @@
             <div class="api-status">
                 <span>
                     <span class="status-dot" id="classifierStatusDot"></span>
-                    <strong>Classifier API:</strong> 
+                    <strong>Backend + Classifier:</strong> 
                     <span id="classifierStatus">Checking...</span>
                 </span>
                 <span>
-                    <strong>Port:</strong> 5002
+                    <strong>Via Backend API</strong>
                 </span>
             </div>
             <div class="api-status">
@@ -319,17 +319,7 @@
                     <span id="backendStatus">Checking...</span>
                 </span>
                 <span>
-                    <strong>Port:</strong> 5000
-                </span>
-            </div>
-            <div class="api-status">
-                <span>
-                    <span class="status-dot" id="frontendStatusDot"></span>
-                    <strong>Frontend:</strong> 
-                    <span id="frontendStatus">Online</span>
-                </span>
-                <span>
-                    <strong>Port:</strong> 3000
+                    <strong>Render</strong>
                 </span>
             </div>
         </div>
@@ -398,20 +388,19 @@
                 <hr style="margin: 1rem 0;">
                 <p><small>💡 <strong>Tip:</strong> For best results, upload clear, well-lit images of a single product. The classifier works best with images similar to the training data.</small></p>
                 <p><small>🔧 <strong>Services:</strong><br>
-                - Backend API: http://localhost:5000<br>
-                - CNN Classifier: http://localhost:5002<br>
-                - Frontend: http://localhost:3000</small></p>
+                - Backend API: https://digital-farmers-market-backend-1.onrender.com<br>
+                - CNN Classifier: https://farm-classifier.onrender.com (internal)<br>
+                - Frontend: This page</small></p>
             </div>
         </div>
     </div>
 
     <script>
-        // IMPORTANT: Backend runs on port 5000, Classifier on port 5002, Frontend on port 3000
-        const BACKEND_URL = 'http://localhost:5000';
-        const CLASSIFIER_URL = 'http://localhost:5002';
+        // ========== PRODUCTION CONFIGURATION ==========
+        // Frontend ONLY calls the backend - backend handles classifier communication
+        const BACKEND_URL = 'https://digital-farmers-market-backend-1.onrender.com';
+        
         let selectedFile = null;
-
-        // Get token from localStorage
         const token = localStorage.getItem('token');
 
         // Check API status on load
@@ -420,7 +409,6 @@
             checkBackendHealth();
             setupImageUpload();
             
-            // Check if user is logged in
             if (!token) {
                 showNotification('⚠️ Please login first to test classification', 'warning');
                 document.getElementById('classifyBtn').disabled = true;
@@ -430,14 +418,16 @@
 
         async function checkClassifierHealth() {
             try {
-                const response = await fetch(`${CLASSIFIER_URL}/classify/health`);
+                // Call backend's classifier health endpoint
+                const response = await fetch(`${BACKEND_URL}/api/classifier/health`);
                 const data = await response.json();
-                document.getElementById('classifierStatus').innerHTML = 'Online';
+                document.getElementById('classifierStatus').innerHTML = 'Online (Model Loaded)';
                 document.getElementById('classifierStatusDot').className = 'status-dot online';
+                console.log('Classifier health via backend:', data);
             } catch (error) {
-                document.getElementById('classifierStatus').innerHTML = 'Offline (start: python app.py)';
+                document.getElementById('classifierStatus').innerHTML = 'Offline - Check Backend';
                 document.getElementById('classifierStatusDot').className = 'status-dot offline';
-                showNotification('Classifier is not running! Start it with: python app.py', 'error');
+                showNotification('Cannot connect to classifier through backend', 'error');
             }
         }
 
@@ -448,9 +438,9 @@
                 document.getElementById('backendStatus').innerHTML = 'Online';
                 document.getElementById('backendStatusDot').className = 'status-dot online';
             } catch (error) {
-                document.getElementById('backendStatus').innerHTML = 'Offline (start: node app.js)';
+                document.getElementById('backendStatus').innerHTML = 'Offline';
                 document.getElementById('backendStatusDot').className = 'status-dot offline';
-                showNotification('Backend is not running! Start it with: node app.js', 'error');
+                showNotification('Backend is not reachable!', 'error');
             }
         }
 
@@ -490,17 +480,13 @@
         function handleImageFile(file) {
             selectedFile = file;
             
-            // Preview image
             const reader = new FileReader();
             reader.onload = (e) => {
                 document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" alt="Preview">`;
             };
             reader.readAsDataURL(file);
             
-            // Hide result card
             document.getElementById('resultCard').style.display = 'none';
-            
-            // Enable buttons
             document.getElementById('classifyBtn').disabled = false;
             document.getElementById('validateBtn').disabled = false;
         }
@@ -550,9 +536,7 @@
                     <div class="result-status invalid">
                         <i class="fas fa-exclamation-triangle"></i>
                         <strong>Error:</strong> ${error.message}<br>
-                        <small>Make sure both services are running:<br>
-                        - Backend: http://localhost:5000<br>
-                        - Classifier: http://localhost:5002</small>
+                        <small>Make sure the backend is running at ${BACKEND_URL}</small>
                     </div>
                 `;
             } finally {
@@ -609,9 +593,7 @@
                     <div class="result-status invalid">
                         <i class="fas fa-exclamation-triangle"></i>
                         <strong>Error:</strong> ${error.message}<br>
-                        <small>Make sure both services are running:<br>
-                        - Backend: http://localhost:5000<br>
-                        - Classifier: http://localhost:5002</small>
+                        <small>Make sure the backend is running at ${BACKEND_URL}</small>
                     </div>
                 `;
             } finally {
@@ -752,7 +734,7 @@
             toast.style.zIndex = '9999';
             toast.style.fontSize = '0.875rem';
             toast.style.fontFamily = 'sans-serif';
-            toast.innerHTML = notification;
+            toast.innerHTML = message;
             document.body.appendChild(toast);
             
             setTimeout(() => {

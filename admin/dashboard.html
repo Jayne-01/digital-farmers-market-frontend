@@ -21,7 +21,7 @@
             // For non-admin users, check maintenance mode
             document.documentElement.style.display = 'none';
             
-            fetch('http://localhost:5000/api/maintenance-status')
+            fetch('https://digital-farmers-market-backend-1.onrender.com/api/maintenance-status')
                 .then(res => res.json())
                 .then(data => {
                     if (data.maintenance_mode === true) {
@@ -869,7 +869,8 @@
             document.body.classList.add('ready');
         })();
 
-        const API_BASE_URL = 'http://localhost:5000/api';
+        // Change this line
+        const API_BASE_URL = 'https://digital-farmers-market-backend-1.onrender.com/api';
         let userChart = null;
         let salesChart = null;
         let isRefreshing = false;

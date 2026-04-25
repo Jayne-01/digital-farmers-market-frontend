@@ -11,7 +11,7 @@
         if (typeof API === 'undefined') {
             console.warn('⚠️ /js/api.js not loaded – using inline fallback.');
             window.API = {
-                baseURL: 'http://localhost:5000/api',
+                baseURL: 'https://digital-farmers-market-backend-1.onrender.com/api',
                 async request(endpoint, options = {}) {
                     const token = localStorage.getItem('token');
                     const headers = { 'Content-Type': 'application/json', ...options.headers };
@@ -553,7 +553,7 @@
             
             try {
                 // Fetch analytics summary for orders
-                const analyticsRes = await fetch('http://localhost:5000/api/admin/analytics', {
+                const analyticsRes = await fetch('https://digital-farmers-market-backend-1.onrender.com/api/admin/analytics', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -569,7 +569,7 @@
                 }
                 
                 // Fetch users to count INACTIVE users
-                const usersRes = await fetch('http://localhost:5000/api/admin/users', {
+                const usersRes = await fetch('https://digital-farmers-market-backend-1.onrender.com/api/admin/users', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -589,7 +589,7 @@
                 
                 // Fetch pending farmers
                 try {
-                    const farmersRes = await fetch('http://localhost:5000/api/admin/farmers/pending-verifications', {
+                    const farmersRes = await fetch('https://digital-farmers-market-backend-1.onrender.com/api/admin/farmers/pending-verifications', {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -612,7 +612,7 @@
                 
                 // Fetch products to count PENDING products
                 try {
-                    const productsRes = await fetch('http://localhost:5000/api/admin/products', {
+                    const productsRes = await fetch('https://digital-farmers-market-backend-1.onrender.com/api/admin/products', {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -702,7 +702,7 @@
             const newStatus = select.value;
             
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/status`, {
+                const response = await fetch(`https://digital-farmers-market-backend-1.onrender.com/api/admin/users/${userId}/status`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

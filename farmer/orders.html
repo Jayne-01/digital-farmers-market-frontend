@@ -1099,7 +1099,7 @@
     <div class="modal-overlay" id="statusModal" style="display: none;"><div class="modal"><button class="modal-close" id="statusModalClose">&times;</button><div class="modal-content"><h2>Update Order Status</h2><div class="status-header-message"><i class="fas fa-info-circle"></i> Select the new status for this order from the options below.</div><form id="statusForm"><input type="hidden" id="statusOrderId"><div class="form-group"><label>Order Status</label><select id="newStatus" class="status-select" required><option value="" disabled selected>-- Select Status --</option><option value="PENDING">Pending</option><option value="CONFIRMED">Confirmed</option><option value="IN_TRANSIT">In Transit</option><option value="DELIVERED">Delivered</option><option value="CANCELLED">Cancelled</option></select><small style="color: #666; display: block; margin-top: 5px;"><i class="fas fa-clock"></i> Choose the appropriate status for this order</small></div><div class="form-actions"><button type="button" class="btn btn-outline btn-sm" id="cancelStatusBtn">Cancel</button><button type="submit" class="btn btn-primary btn-sm" id="updateStatusSubmitBtn">Update Status</button></div></form></div></div></div>
 
     <script>
-        const BACKEND_URL = 'http://localhost:5000';
+        const BACKEND_URL = 'https://digital-farmers-market-backend-1.onrender.com';
         let allOrders = [];
 
         // Helper function to get display product name - PRIORITIZE SNAPSHOT

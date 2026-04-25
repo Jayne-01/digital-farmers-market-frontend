@@ -1,7 +1,10 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+// ========== BACKEND CONFIGURATION ==========
+const BACKEND_URL = 'https://digital-farmers-market-backend-1.onrender.com';
 
 // ========== MAINTENANCE MODE STATE ==========
 let isMaintenanceMode = false;
@@ -10,7 +13,7 @@ let isMaintenanceMode = false;
 async function fetchMaintenanceStatus() {
     try {
         const fetch = await import('node-fetch');
-        const response = await fetch.default('http://localhost:5000/api/maintenance-status');
+        const response = await fetch.default(`${BACKEND_URL}/api/maintenance-status`);
         const data = await response.json();
         isMaintenanceMode = data.maintenance_mode === true;
         console.log(`🔧 Maintenance mode from backend: ${isMaintenanceMode ? 'ON' : 'OFF'}`);
@@ -156,12 +159,13 @@ app.use((req, res) => {
     `);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
     console.log('   🚀 FRONTEND SERVER RUNNING');
     console.log('='.repeat(60));
-    console.log(`   📍 URL: http://localhost:${PORT}`);
+    console.log(`   📍 URL: http://0.0.0.0:${PORT}`);
     console.log(`   📁 Serving from: ${__dirname}`);
+    console.log(`   🔗 Backend: ${BACKEND_URL}`);
     console.log(`   🔧 Maintenance mode: ${isMaintenanceMode ? 'ON' : 'OFF'}`);
     console.log('='.repeat(60) + '\n');
 });

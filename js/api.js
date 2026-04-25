@@ -10,11 +10,14 @@ let isMaintenanceMode = false;
 // Function to fetch maintenance status from backend using native http
 function fetchMaintenanceStatus() {
     const options = {
-        hostname: 'localhost',
-        port: 5000,
+        hostname: 'digital-farmers-market-backend-1.onrender.com',
+        port: 443,  // HTTPS port
         path: '/api/maintenance-status',
         method: 'GET',
-        timeout: 5000
+        timeout: 5000,
+        headers: {
+            'Host': 'digital-farmers-market-backend-1.onrender.com'
+        }
     };
     
     const req = http.request(options, (res) => {
@@ -100,15 +103,15 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // Proxy middleware to forward API requests to backend
 // Remove the leading /api from the path to avoid double /api
+// Proxy middleware to forward API requests to backend
 app.use('/api', (req, res) => {
-    // The URL already starts with /api, so we don't add another one
-    const backendUrl = `http://localhost:5000${req.url}`;
+    const backendUrl = `https://digital-farmers-market-backend-1.onrender.com${req.url}`;
     console.log(`🔄 Proxying API request: ${req.method} ${req.url} -> ${backendUrl}`);
     
     const options = {
-        hostname: 'localhost',
-        port: 5000,
-        path: req.url,  // Use req.url as-is (already starts with /api)
+        hostname: 'digital-farmers-market-backend-1.onrender.com',
+        port: 443,  // HTTPS port
+        path: req.url,
         method: req.method,
         headers: req.headers
     };
