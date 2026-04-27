@@ -1,10 +1,33 @@
 const express = require('express');
 const path = require('path');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ========== BACKEND CONFIGURATION ==========
 const BACKEND_URL = 'https://digital-farmers-market-backend-1.onrender.com';
+
+// ========== PROXY MIDDLEWARE - Forward API requests to backend ==========
+// This allows your frontend to use relative paths like '/api/...'
+app.use('/api', createProxyMiddleware({
+    target: BACKEND_URL,
+    changeOrigin: true,
+    secure: false,
+    onProxyReq: (proxyReq, req, res) => {
+        console.log(`🔄 Proxy: ${req.method} ${req.url} → ${BACKEND_URL}${req.url}`);
+    },
+    onError: (err, req, res) => {
+        console.error('❌ Proxy error:', err.message);
+        res.status(502).json({ error: 'Backend service unavailable' });
+    }
+}));
+
+// Also proxy uploads and other static assets from backend
+app.use('/uploads', createProxyMiddleware({
+    target: BACKEND_URL,
+    changeOrigin: true,
+    secure: false
+}));
 
 // ========== MAINTENANCE MODE STATE ==========
 let isMaintenanceMode = false;
@@ -12,8 +35,8 @@ let isMaintenanceMode = false;
 // Function to fetch maintenance status from backend
 async function fetchMaintenanceStatus() {
     try {
-        const fetch = await import('node-fetch');
-        const response = await fetch.default(`${BACKEND_URL}/api/maintenance-status`);
+        const fetchModule = await import('node-fetch');
+        const response = await fetchModule.default(`${BACKEND_URL}/api/maintenance-status`);
         const data = await response.json();
         isMaintenanceMode = data.maintenance_mode === true;
         console.log(`🔧 Maintenance mode from backend: ${isMaintenanceMode ? 'ON' : 'OFF'}`);
@@ -46,8 +69,8 @@ app.use((req, res, next) => {
         '/auth/login.html',     // Customer login page
         '/auth/register',       // Registration page (allow during maintenance)
         '/auth/register.html',  // Registration page
-        '/api/auth/login',      // Customer login API
-        '/api/auth/admin/login' // Admin login API
+        '/api/',                // API calls (allow to check maintenance status)
+        '/uploads/'             // Uploaded images
     ];
     
     const isAlwaysAllowed = alwaysAllowPaths.some(path => requestPath.startsWith(path));
@@ -160,12 +183,14 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n' + '='.repeat(60));
-    console.log('   🚀 FRONTEND SERVER RUNNING');
-    console.log('='.repeat(60));
-    console.log(`   📍 URL: http://0.0.0.0:${PORT}`);
-    console.log(`   📁 Serving from: ${__dirname}`);
-    console.log(`   🔗 Backend: ${BACKEND_URL}`);
-    console.log(`   🔧 Maintenance mode: ${isMaintenanceMode ? 'ON' : 'OFF'}`);
-    console.log('='.repeat(60) + '\n');
+    console.log('\n' + '='.repeat(70));
+    console.log('   🚀 DIGITAL FARMERS MARKET - FRONTEND SERVER');
+    console.log('='.repeat(70));
+    console.log(`   📍 URL:            http://0.0.0.0:${PORT}`);
+    console.log(`   📁 Serving from:   ${__dirname}`);
+    console.log(`   🔗 Backend API:    ${BACKEND_URL}`);
+    console.log(`   🔄 API Proxy:      /api/* → ${BACKEND_URL}/api/*`);
+    console.log(`   🖼️ Uploads Proxy:  /uploads/* → ${BACKEND_URL}/uploads/*`);
+    console.log(`   🔧 Maintenance:    ${isMaintenanceMode ? 'ON' : 'OFF'}`);
+    console.log('='.repeat(70) + '\n');
 });
